@@ -114,8 +114,8 @@ export class Viewer
         this.is_smoke=false
         this.iswater=false
         this.nssmoke = 0
-        // this.smoke_new=new smokemap(this.sceneEx)
-        // this.smoke_new.init(this.renderer)
+        this.smoke_new=new smokemap(this.sceneEx)
+        this.smoke_new.init(this.renderer)
         // this.fire = new Fire([0,0,0], this.sceneEx)
         this.smoke = new Smoke(this.sceneEx, this.renderer)
         this.people = new AvatarManager(this.sceneEx,this.defaultCamera)
@@ -128,7 +128,7 @@ export class Viewer
         this.pressed = false
         var _self = this
         this.onKeyDown = function (event){
-            if(event.key==="U"||event.key==="u"){//创建平面
+            if(event.key==="U"||event.key==="u"){
                 _self.groundMesh.position.z += 1
                 console.log(_self.groundMesh.position.z)
             }else if(event.key==="J"||event.key==="j"){
@@ -144,8 +144,8 @@ export class Viewer
                     _self.sceneEx.add(_self.groundMesh)
                     _self.plane=true
                 }
-            }else if(event.key==="P"||event.key==="p"){//生成人和火焰
-                self.people = new AvatarManager(_self.sceneEx,_self.defaultCamera)
+            }else if(event.key==="P"||event.key==="p"){
+                // self.people = new AvatarManager(_self.sceneEx,_self.defaultCamera)
                 if(_self.ispeople == 0){
                     const firemap = new THREE.TextureLoader().load('textures/fire1.png')
                     _self.fire = new TextureAnimator( firemap, 3, 2, 6, 55 ); // texture, #horiz, #vert, #total, duration.
@@ -161,11 +161,12 @@ export class Viewer
                 }   
                 _self.ispeople += 1
                 if(_self.ispeople>2){
+                    console.log(12)
                     _self.is_smoke=true
                     _self.ispeople=1
                 }
                     
-            }else if(event.key==="F"||event.key==="f"){//老版烟雾效果
+            }else if(event.key==="F"||event.key==="f"){
                 const vertexShader = `
                     uniform float time;
                     uniform float opacityData[10000]; // 假设一维数组大小为100x100
@@ -222,7 +223,7 @@ export class Viewer
 
                 _self.trymesh = new THREE.Mesh(geom, _self.trym);
                 _self.sceneEx.add(_self.trymesh);
-            }else if(event.key==="O"||event.key==="o"){//将建筑物变为透明
+            }else if(event.key==="O"||event.key==="o"){
                 _self.is_edit+=1
                 // window.model.op=0.1
                 _self.people.draw()
@@ -233,7 +234,7 @@ export class Viewer
                 _self.people.enter_edit(_self.is_edit)
             }else if(event.keyCode == 16){//shift
                 _self.pressed = true
-            }else if(event.key==="T"||event.key==="t"){//开始扩散
+            }else if(event.key==="T"||event.key==="t"){
                 // if(_self.nssmoke == 0)
                 //     _self.smoke_new.init()
                 // else if(_self.nssmoke == 1){
@@ -243,7 +244,7 @@ export class Viewer
                 //     _self.smoke_new.randomstart()
                 // }else if(_self.nssmoke>3) _self.nssmoke=2
                 _self.nssmoke+=1
-            }else if(event.key === "z"){//生成一个平面
+            }else if(event.key === "z"){
                 var geometry = new THREE.PlaneGeometry(100, 100);
                 var material = new THREE.ShaderMaterial({
                     transparent: true,
@@ -257,6 +258,60 @@ export class Viewer
             
                 var mesh = new THREE.Mesh(geometry, material);
                 _self.sceneEx.add(mesh);
+            }else if(event.key === "v") {
+                let tex = new THREE.TextureLoader().load('textures/waterdudv.jpg')
+                let vertexShader = /* glsl */`
+                    in vec3 position;
+                    in vec3 resolution;
+                    out vec3 mposition;
+
+                    uniform mat4 modelMatrix;
+                    uniform mat4 modelViewMatrix;
+                    uniform mat4 projectionMatrix;
+
+                    uniform vec3 res;
+                    
+                    void main() {
+                        mposition = position / res + 0.5;
+                        vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                        gl_Position = projectionMatrix * mvPosition;
+                    }
+                
+				`;
+
+				let fragmentShader = /* glsl */`
+					precision highp float;
+
+					uniform mat4 modelViewMatrix;
+					uniform mat4 projectionMatrix;
+
+					out vec4 color;
+                    in vec3 mposition;
+
+					uniform sampler2D map;
+
+					void main(){
+                        vec2 vUV=vec2(mposition.x, mposition.y);
+                        vec4 tex = texture(map, vUV);
+                        color = tex;
+					}
+				`;
+                let resolution = new THREE.Vector3(100, 100, 100)
+                let geo = new THREE.BoxGeometry( 100, 100, 100 )
+                let mat = new THREE.RawShaderMaterial( {
+					glslVersion: THREE.GLSL3,
+					uniforms: {
+						map: { value: tex },
+                        res: { value: resolution }
+					},
+					vertexShader,
+					fragmentShader,
+					transparent: true
+				} );
+                let mesh = new THREE.Mesh(geo, mat)
+                let me = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({color: 0x000000}))
+                
+                _self.sceneEx.add(mesh)
             }
         }
 

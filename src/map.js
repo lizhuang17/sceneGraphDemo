@@ -1,4 +1,3 @@
-//寻路使用的网格
 import * as THREE from "three"
 export class escapmap{
     constructor(){

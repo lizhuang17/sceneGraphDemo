@@ -3,11 +3,7 @@ import { Crowd } from '../lib/crowd/Crowd.js'
 import {escapmap} from './map.js'
 import { GridHelperX } from '../lib/GridHelperX'
 import * as THREE from "three"
-import sceneConifg from '../config/sceneConifg_0.json'
-// import sceneConifg from '../config/sceneConifg_man02.json'
-// import sceneConifg from '../config/sceneConifg_man_B.json'
 
-// import sceneConifg from '../config/sceneConifg_woman0.json'
 export class AvatarManager {
     constructor(scene, camera, count=1000, floors=1) {
         this.scene = scene
@@ -309,17 +305,7 @@ export class AvatarManager {
             "lod_geometry":    [ 20 ],
             "lod_avatarCount": [ 200 ]
         }
-        // console.log(
-        //     "sceneConifg",sceneConifg,
-        //     "c0",c0
-        // )
-        const test=sceneConifg[1]
-        test.lod_avatarCount=[200]
-        test.lod_distance=[ 5000, 15000, 30000, 60000, 100000 ]
-        console.log(test)
-        return test
-
-        return c0
+        return c1
     }
     start(){
         let def = true
