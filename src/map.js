@@ -9,8 +9,9 @@ export class escapmap{
         this.ext_mesh = null
         this.matrix = []
         this.count = 0// HaiNing2-1:131587, KaiLiNan4-1:4062291
+        this.finish_load = false
     }
-    init(map){
+    init(map, scene=null){
         let floor = []
         for(var x = 0; x < map.length; x++){
             let row = []
@@ -19,20 +20,25 @@ export class escapmap{
             }
             floor.push(row)
         }
-        const geometry = new THREE.BufferGeometry()
-		const vertices = new Float32Array( [
-			-1.0, -1.0,  1.0, // v0
-			 1.0, -1.0,  1.0, // v1
-			 1.0,  1.0,  1.0, // v2
 
-			 1.0,  1.0,  1.0, // v3
-			-1.0,  1.0,  1.0, // v4
-			-1.0, -1.0,  1.0  // v5
-		] )
-		geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) )
-		const material = new THREE.MeshBasicMaterial( { color: 0x000000 } )
-		this.meshs = new THREE.InstancedMesh( geometry, material, 4062300)
+        const ball = new THREE.BufferGeometry()
+        const ball_v = []
+        const circleRadius = 1.0; // 圆片的半径
+        const circleSegments = 32; // 圆片的分段数
+        for (let i = 0; i <= circleSegments; i++) {
+            const theta = (i / circleSegments) * Math.PI * 2; // 计算当前分段的角度
+            const x = Math.cos(theta) * circleRadius; // 计算当前分段的x坐标
+            const y = Math.sin(theta) * circleRadius; // 计算当前分段的y坐标
+            ball_v.push(x, y, 0); // 将顶点坐标添加到数组中
+        }
+
+        const positions = new Float32Array(ball_v); // 创建Float32Array类型的顶点坐标数组
+        ball.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+		const ball_m = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
+		this.balls = new THREE.InstancedMesh( ball, ball_m, 10000)
+        
         this.grids.push(this.link(floor))
+        this.finish_load = true
     }
     link(grid){
         /*  1|2|3
@@ -56,7 +62,7 @@ export class escapmap{
                     try{var n8=grid[x-1][y];if(n8==undefined)n8 = null;}catch{var n8 = null;}
                     grid[x][y].findchild([n1,n2,n3,n4,n5,n6,n7,n8])
                 }
-                // if(grid[x][y].ph == 0){
+                // if(grid[x][y].ph == -1){
                 //     // 计划加入烟雾，让烟雾也占据格子，多分辨率：用不同粒度的烟雾粒子填格子，参考人群的实现方法
                 //     this.meshs.setMatrixAt(this.count,new THREE.Matrix4().set(1,0,0,x-1322,0,1,0,y-751,0,0,1,481,0,0,0,1))// 需要修改，将map_edge传入
                 //     this.count+=1
@@ -101,38 +107,203 @@ class ceil
         }
     }
     setpeople(id){
+        this.know *= 3 / 4
         this.people=id
         this.ph=-1
+        // let count = 0
+        // for(var i=0;i<8;i++){
+        //     if(this.child[i] && this.child[i].panic){
+        //         this.panic += this.child[i].panic
+        //         count++
+        //     }
+        // }
+        // if(count > 0)
+        //     this.panic /= count
     }
-    nextstep(){
+    nextstep(e){
         let m = Infinity
         let n = 8
         let next = this.pos
+        // console.log(e)
         for(var i=0;i<8;i++){
-            if(this.child[i] && this.child[i].ph >= 0){
-                if(this.child[i].ph0 < m){
-                    m = this.child[i].ph0
+            if(this.child[i] && this.child[i].ph >= 0 && this.child[i].ph0 < this.ph0){
+                let ifl = i % 2 == 1 ? 0.95 : 1
+                let phem = (this.child[i].ph0*e+(1-e)*this.child[i].know )* ifl
+                // let phem = this.child[i].ph0*e
+                if(phem < m){
+                    m = phem
                     n = i
                     next = this.child[n].pos
-                }else if(this.child[i].ph0 == m){
+                }else if(phem == m){
                     n = i % 2 > n % 2 ? i : n
                     next = this.child[n].pos
                 }
 
             }
         }
+        let new_e = e
         if(m == 0){
             this.people=-1
             this.ph=this.ph0
         }
         else if(n < 8){
+            if(this.know > e)
+                new_e = e
+            if(this.ph0 > this.child[n].ph0)
+                this.know += e
             this.child[n].setpeople(this.id)
-            this.child[n].ore = n
             this.people=-1
             this.ph=this.ph0
         } 
-        return [n, this.ph0, next[0], next[1], -3]
+        // console.log(n, next)
+        return [n, this.ph0, next[0], next[1], 480, new_e]
     }
+    // nextstep(e){
+    //     let n = Infinity
+    //     let next = this.pos
+    //     let x = next[0]
+    //     let y = next[1]
+    //     console.log(this.parent.grids[0][x][y])
+    //     let o = this.ore
+    //     var n1,n2,n3,n4,n5,n6,n7,n8 = null
+    //     switch(o){
+    //         case 1:
+    //             try{n8=this.parent.grids[0][x-1][y].ph;if(n8==undefined || n8<0)n8 = null;else if(n8>0) n8=(n8*e+(1-e)*this.parent.grids[0][x-1][y].know)*0.95}catch{var n8 = null;}
+    //             if(n && n > n8) {n = n8; o=7}
+    //             try{n1=this.parent.grids[0][x-1][y+1].ph;if(n1==undefined || n1<0)n1 = null;else if(n8>0)n1=n1*e+(1-e)*this.parent.grids[0][x-1][y+1].know}catch{var n1 = null;}   
+    //             if(n && n > n1) {n = n1; o=0}
+    //             try{n2=this.parent.grids[0][x][y+1].ph;if(n2==undefined || n2<0)n2 = null;else if(n8>0)n2=(n2*e+(1-e)*this.parent.grids[0][x][y+1].know)*0.95}catch{var n2 = null;}
+    //             if(n && n > n2) {n = n2; o=1}
+    //             break
+    //         case 2:
+    //             try{n1=this.parent.grids[0][x-1][y+1].ph;if(n1==undefined || n1<0)n1 = null;else if(n8>0)n1=(n1*e+(1-e)*this.parent.grids[0][x-1][y+1].know)*0.95}catch{var n1 = null;}
+    //             if(n && n > n1) {n = n1; o=0}
+    //             try{n2=this.parent.grids[0][x][y+1].ph;if(n2==undefined || n2<0)n2 = null;else if(n8>0)n2=n2*e+(1-e)*this.parent.grids[0][x][y+1].know}catch{var n2 = null;}
+    //             if(n && n > n2) {n = n2; o=1}
+    //             try{n3=this.parent.grids[0][x+1][y+1].ph;if(n3==undefined || n3<0)n3 = null;else if(n8>0)n3=(n3*e+(1-e)*this.parent.grids[0][x+1][y+1].know)*0.95}catch{var n3 = null;}
+    //             if(n && n > n3) {n = n3; o=2}
+    //             break
+    //         case 3:
+    //             try{n2=this.parent.grids[0][x][y+1].ph;if(n2==undefined || n2<0)n2 = null;else if(n8>0)n2=(n2*e+(1-e)*this.parent.grids[0][x][y+1].know)*0.95}catch{var n2 = null;}
+    //             if(n && n > n2) {n = n2; o=1}
+    //             try{n3=this.parent.grids[0][x+1][y+1].ph;if(n3==undefined || n3<0)n3 = null;else if(n8>0)n3=n3*e+(1-e)*this.parent.grids[0][x+1][y+1].know}catch{var n3 = null;}
+    //             if(n && n > n3) {n = n3; o=2}
+    //             try{n4=this.parent.grids[0][x+1][y].ph;if(n4==undefined || n4<0)n4 = null;else if(n8>0)n4=(n4*e+(1-e)*this.parent.grids[0][x+1][y].know)*0.95}catch{var n4 = null;}
+    //             if(n && n > n4) {n = n4; o=3}
+    //             break
+    //         case 4:
+    //             try{n3=this.parent.grids[0][x+1][y+1].ph;if(n3==undefined || n3<0)n3 = null;else if(n8>0)n3=(n3*e+(1-e)*this.parent.grids[0][x+1][y+1].know)*0.95}catch{var n3 = null;}
+    //             if(n && n > n3) {n = n3; o=2}
+    //             try{n4=this.parent.grids[0][x+1][y].ph;if(n4==undefined || n4<0)n4 = null;else if(n4>0)n4=n4*e+(1-e)*this.parent.grids[0][x+1][y].know}catch{var n4 = null;}
+    //             if(n && n > n4) {n = n4; o=3}
+    //             try{n5=this.parent.grids[0][x+1][y-1].ph;if(n5==undefined || n5<0)n5 = null;else if(n5>0)n5=(n5*e+(1-e)*this.parent.grids[0][x+1][y-1].know)*0.95}catch{var n5 = null;}
+    //             if(n && n > n5) {n = n5; o=4}
+    //             break
+    //         case 5:
+    //             try{n4=this.parent.grids[0][x+1][y].ph;if(n4==undefined || n4<0)n4 = null;else if(n4>0)n4=(n4*e+(1-e)*this.parent.grids[0][x+1][y].know)*0.95}catch{var n4 = null;}
+    //             if(n && n > n4) {n = n4; o=3}
+    //             try{n5=this.parent.grids[0][x+1][y-1].ph;if(n5==undefined || n5<0)n5 = null;else if(n5>0)n5=n5*e+(1-e)*this.parent.grids[0][x+1][y-1].know}catch{var n5 = null;}
+    //             if(n && n > n5) {n = n5; o=4}
+    //             try{n6=this.parent.grids[0][x][y-1].ph;if(n6==undefined || n6<0)n6 = null;else if(n6>0)n6=(n6*e+(1-e)*this.parent.grids[0][x][y-1].know)*0.95}catch{var n6 = null;}
+    //             if(n && n > n6) {n = n6; o=5}
+    //             break
+    //         case 6:
+    //             try{n5=this.parent.grids[0][x+1][y-1].ph;if(n5==undefined || n5<0)n5 = null;else if(n5>0)n5=(n5*e+(1-e)*this.parent.grids[0][x+1][y-1].know)*0.95}catch{var n5 = null;}
+    //             if(n && n > n5) {n = n5; o=4}
+    //             try{n6=this.parent.grids[0][x][y-1].ph;if(n6==undefined || n6<0)n6 = null;else if(n6>0)n6=n6*e+(1-e)*this.parent.grids[0][x][y-1].know}catch{var n6 = null;}
+    //             if(n && n > n6) {n = n6; o=5}
+    //             try{n7=this.parent.grids[0][x-1][y-1].ph;if(n7==undefined || n7<0)n7 = null;else if(n7>0)n7=(n7*e+(1-e)*this.parent.grids[0][x-1][y-1].know)*0.95}catch{var n7 = null;}
+    //             if(n && n > n7) {n = n7; o=6}
+    //             break
+    //         case 7:
+    //             try{n6=this.parent.grids[0][x][y-1].ph;if(n6==undefined || n6<0)n6 = null;else if(n6>0)n6=(n6*e+(1-e)*this.parent.grids[0][x][y-1].know)*0.95}catch{var n6 = null;}
+    //             if(n && n > n6) {n = n6; o=5}
+    //             try{n7=this.parent.grids[0][x-1][y-1].ph;if(n7==undefined || n7<0)n7 = null;else if(n7>0)n7=n7*e+(1-e)*this.parent.grids[0][x-1][y-1].know}catch{var n7 = null;}
+    //             if(n && n > n7) {n = n7; o=6}
+    //             try{n8=this.parent.grids[0][x-1][y].ph;if(n8==undefined || n8<0)n8 = null;else if(n8>0)n8=(n8*e+(1-e)*this.parent.grids[0][x-1][y].know)*0.95}catch{var n8 = null;}
+    //             if(n && n > n8) {n = n8; o=7}
+    //             break
+    //         case 8:
+    //             try{n7=this.parent.grids[0][x-1][y-1].ph;if(n7==undefined || n7<0)n7 = null;else if(n7>0)n7=(n7*e+(1-e)*this.parent.grids[0][x-1][y-1].know)*0.95}catch{var n7 = null;}
+    //             if(n && n > n7) {n = n7; o=6}
+    //             try{n8=this.parent.grids[0][x-1][y].ph;if(n8==undefined || n8<0)n8 = null;else if(n8>0)n8=n8*e+(1-e)*this.parent.grids[0][x-1][y].know}catch{var n8 = null;}
+    //             if(n && n > n8) {n = n8; o=7}
+    //             try{n1=this.parent.grids[0][x-1][y+1].ph;if(n1==undefined || n1<0)n1 = null;else if(n1>0)n1=(n1*e+(1-e)*this.parent.grids[0][x-1][y+1].know)*0.95}catch{var n1 = null;}
+    //             if(n && n > n1) {n = n1; o=0}
+    //             break
+    //         default:
+    //             try{n1=this.parent.grids[0][x-1][y+1].ph;if(n1==undefined || n1<0)n1 = null;else if(n1>0)n1=(n1*e+(1-e)*this.parent.grids[0][x-1][y+1].know)*0.95}catch{var n1 = null;}
+    //             try{n2=this.parent.grids[0][x][y+1].ph;if(n2==undefined || n2<0)n2 = null;else if(n2>0)n2=n2*e+(1-e)*this.parent.grids[0][x][y+1].know}catch{var n2 = null;}
+    //             try{n3=this.parent.grids[0][x+1][y+1].ph;if(n3==undefined || n3<0)n3 = null;else if(n3>0)n3=(n3*e+(1-e)*this.parent.grids[0][x+1][y+1].know)*0.95}catch{var n3 = null;}
+    //             try{n4=this.parent.grids[0][x+1][y].ph;if(n4==undefined || n4<0)n4 = null;else if(n4>0)n4=n4*e+(1-e)*this.parent.grids[0][x+1][y].know}catch{var n4 = null;}
+    //             try{n5=this.parent.grids[0][x+1][y-1].ph;if(n5==undefined || n5<0)n5 = null;else if(n5>0)n5=(n5*e+(1-e)*this.parent.grids[0][x+1][y-1].know)*0.95}catch{var n5 = null;}
+    //             try{n6=this.parent.grids[0][x][y-1].ph;if(n6==undefined || n6<0)n6 = null;else if(n6>0)n6=n6*e+(1-e)*this.parent.grids[0][x][y-1].know}catch{var n6 = null;}
+    //             try{n7=this.parent.grids[0][x-1][y-1].ph;if(n7==undefined || n7<0)n7 = null;else if(n7>0)n7=(n7*e+(1-e)*this.parent.grids[0][x-1][y-1].know)*0.95}catch{var n7 = null;}
+    //             try{n8=this.parent.grids[0][x-1][y].ph;if(n8==undefined || n8<0)n8 = null;else if(n8>0)n8=n8*e+(1-e)*this.parent.grids[0][x-1][y].know}catch{var n8 = null;}
+    //             if(n && n > n1) {n = n1; o=0}
+    //             if(n && n > n2) {n = n2; o=1}
+    //             if(n && n > n3) {n = n3; o=2}
+    //             if(n && n > n4) {n = n4; o=3}
+    //             if(n && n > n5) {n = n5; o=4}
+    //             if(n && n > n6) {n = n6; o=5}
+    //             if(n && n > n7) {n = n7; o=6}
+    //             if(n && n > n8) {n = n8; o=7}
+    //             break
+    //     }
+    //     let new_e = e
+    //     let child = null 
+    //     switch(o){
+    //         case 0:
+    //             child = this.parent.grids[0][x-1][y+1]
+    //             next[0]-=1
+    //             next[1]+=1
+    //             break
+    //         case 1:
+    //             child = this.parent.grids[0][x][y+1]
+    //             next[1]+=1
+    //             break
+    //         case 2:
+    //             child = this.parent.grids[0][x+1][y+1]
+    //             next[0]+=1
+    //             next[1]+=1
+    //             break
+    //         case 3:
+    //             child = this.parent.grids[0][x+1][y]
+    //             next[0]+=1
+    //             break
+    //         case 4:
+    //             child = this.parent.grids[0][x+1][y-1]
+    //             next[0]+=1
+    //             next[1]-=1
+    //             break
+    //         case 5:
+    //             child = this.parent.grids[0][x][y-1]
+    //             next[1]-=1
+    //             break
+    //         case 6:
+    //             child = this.parent.grids[0][x-1][y-1]
+    //             next[0]-=1
+    //             next[1]-=1
+    //             break
+    //         case 7:
+    //             child = this.parent.grids[0][x-1][y]
+    //             next[0]-=1
+    //             break
+    //         default:
+    //             child = this
+    //             break
+    //     } 
+    //     if(this.know > e)
+    //         new_e = e
+    //     if(this.ph0 > child.ph0)
+    //         this.know += e
+    //     child.setpeople(this.id)
+    //     child.ore = o
+    //     this.people=-1
+    //     this.ph=this.ph0
+    //     this.ore = -1
+    //     return [o, this.ph0, next[0], next[1], 481, new_e]
+    // }
     // set_ext(ext){
     //     this.ext = ext
     //     if(ext < 100)

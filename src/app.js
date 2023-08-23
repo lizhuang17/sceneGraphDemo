@@ -13,16 +13,16 @@ class App
 
     var parseUrlParams = function()
     {
-      var urlParams = window.location.href.split('?')[1].split('=');
+      // var urlParams = window.location.href.split('?')[1].split('=');
+      // console.log(urlParams[0])
       var vars = {};
-      vars[urlParams[0]] = urlParams[1];
+      vars["scene"] = "KaiLiNan";
       return vars;
     }
 
     var paramJson = parseUrlParams();
     window.projectName = paramJson.scene
     this.createViewer(paramJson);
-
     if (paramJson.scene)
     {
       window.model = new SceneManager(this.viewer)

@@ -1,12 +1,18 @@
 import * as THREE from "three"
+import {escapmap} from './map.js'
 import {GPUComputationRenderer} from '../lib/three/examples/jsm/misc/GPUComputationRenderer.js'
 import { SimplexNoise } from '../lib/three/examples/jsm/math/SimplexNoise.js';
+import {TextureAnimator} from '../lib/TextureAnimator'
 export class smokemap{
     constructor(scene){
         this.scene = scene
+        this.map = []
+        this.final = []
+        this.maps=new escapmap()
         this.map_edges = []
         this.grids = undefined
         this.meshs = undefined
+        this.rm = undefined
         this.count = 0// HaiNing2-1:131587, KaiLiNan4-1:4062291
         this.move_mesh = undefined
         this.smoke_plane = undefined
@@ -18,13 +24,10 @@ export class smokemap{
         this.dops = []// 变化的块的变化程度
         this.smoke_Q = 10000
         this.finish_load = false
-    }
-    init(renderer, pos = [100, 100]){
-        const self = this
+        let self = this
         const loader = new THREE.FileLoader();
-        loader.load('maps/KaiLiNan_map4-1.csv', function (value) {
+        loader.load('KaiLiNan.csv', function (value) {
             let i = 0;
-            let map = []
             value.split('\n').forEach(function(v){
                 if(i == 0){
                     v.split(',').forEach(function(w){
@@ -34,28 +37,74 @@ export class smokemap{
                 }else{
                     let line = []
                     v.split(',').forEach(function(w){
-                        line.push(new ceil(parseInt(w)))
+                        line.push(parseInt(w))
                     });
                     if(line.length > 5)
-                        map.push(line)
+                        self.map.push(line)
                 }
             });
-
-            self.smoke_plane = new smokeplane(map, self.map_edges, pos, self.scene, renderer)
-
-            self.grids=self.link(map)
-
-            self.finish_load = true
-
-            console.log("finish_smoke_map")
-        })    
-        // this.move_mesh = new move_particle(this.start, this.list)
+        })  
+        loader.load('KaiLiNan4-1.csv', function (value) {
+            value.split('\n').forEach(function(v){
+                let line = []
+                v.split(',').forEach(function(w){
+                    line.push(parseInt(w))
+                });
+                if(line.length > 6)
+                    self.final.push(line)
+            });
+        }) 
     }
+    init(renderer, pos = [1800, 1000]){//[815, 320]
+        {
+            // self.rm = new Mesh(new PlaneGeometry(10,10), new THREE.MeshBasicMaterial( { color: 0xff0000, side:THREE.DoubleSide } ))
+            // self.am = new Mesh(new PlaneGeometry(10,10), new THREE.MeshBasicMaterial( { color: 0xffff00, side:THREE.DoubleSide } ))
+            // self.am.position.set(pos[0]-1422,pos[1]-848,555)
+            // self.rm.position.set(pos[0]-1322,pos[1]-768-20,555) // KaiLiNan
+            // // self.rm.position.set(pos[0]-992,pos[1]-425,10)
 
+            // // self.scene.add(self.rm)
+            // // self.scene.add(self.am)
+            // const geometry = new THREE.BufferGeometry()
+            // const vertices = new Float32Array( [
+            //     -1.0, -1.0,  1.0, // v0
+            //      1.0, -1.0,  1.0, // v1
+            //      1.0,  1.0,  1.0, // v2
+    
+            //      1.0,  1.0,  1.0, // v3
+            //     -1.0,  1.0,  1.0, // v4
+            //     -1.0, -1.0,  1.0  // v5
+            // ] )
+            // geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) )
+            // const material = new THREE.MeshBasicMaterial( { color: 0x0000ff } )
+            // self.meshs = new THREE.InstancedMesh( geometry, material, 4062300)
+            // self.grids=self.link(map)
+            // // self.scene.add(self.meshs)
+
+            // let wall = new Mesh(new PlaneGeometry(10000,10000), new THREE.MeshBasicMaterial( { color: 0xaaaaaa, side:THREE.DoubleSide } ))
+            // wall.position.set(0,0,0)
+            // wall.rotation.set(Math.PI/2,0,0)
+            // // self.scene.add(wall)
+        }
+        this.smoke_plane = new smokeplane(this.map, this.map_edges, pos, this.scene, renderer)
+        this.maps.init(this.final,this.scene)
+
+        this.firemap = new THREE.TextureLoader().load('textures/fire.webp')
+        this.fire_t = new TextureAnimator( this.firemap, 12, 6, 72, 55 ); // texture, #horiz, #vert, #total, duration.
+        let Fmaterial=new THREE.SpriteMaterial({ transparent: true, map: this.firemap, color: 0xffffff });
+        this.Fmesh = new THREE.Sprite(Fmaterial);
+        this.Fmesh.position.set(pos[0]-1322,pos[1]-768,520) 
+        this.Fmesh.scale.set(100,100,100)
+        this.scene.add(this.Fmesh)
+        
+        this.finish_load = true
+        console.log("finish_smoke_map") 
+    }
     link(grid){
         /*  1|2|3
             8|x|4
             7|6|5   */
+        let rn = 0
         let lenx = grid.length
         let leny = grid[0].length
         for(var x = 0; x < lenx; x++){
@@ -69,14 +118,86 @@ export class smokemap{
                     try{var n6=grid[x][y-1];if(n6==undefined)n6 = null;}catch{var n6 = null;}
                     try{var n7=grid[x-1][y-1];if(n7==undefined)n7 = null;}catch{var n7 = null;}
                     try{var n8=grid[x-1][y];if(n8==undefined)n8 = null;}catch{var n8 = null;}
-                    grid[x][y].findchild([n1,n2,n3,n4,n5,n6,n7,n8], this.count, [x+this.map_edges[1],y+this.map_edges[3]])
-                    this.count += 1
+                    grid[x][y].findchild([n1,n2,n3,n4,n5,n6,n7,n8], 0, [x+this.map_edges[1],y+this.map_edges[3]])
+                    // this.count += 1
                 }
+                else if(grid[x][y].ph == -1){
+                    // this.meshs.setMatrixAt(this.count, new THREE.Matrix4().set(1,0,0,x-992,0,1,0,y-425,0,0,1,10,0,0,0,1))
+                    this.meshs.setMatrixAt(this.count, new THREE.Matrix4().set(1,0,0,x-1322,0,1,0,y-768,0,0,1,555,0,0,0,1))// 需要修改，将map_edge传入
+                    this.count+=1
+                }
+                // else{
+                //     this.rm.setMatrixAt(rn,new THREE.Matrix4().set(1,0,0,x-1322,0,1,0,y-751,0,0,1,481,0,0,0,1))// 需要修改，将map_edge传入
+                //     rn+=1
+                // }
             }
         }
         return grid
     }
-
+    combin(map){
+        var mx = map.length
+        var my = map[0].length
+        if(my % 4 != 0){
+            for(var i = 0; i < 4 - my % 4; i++){
+                for(var j = 0; j < mx; j++){
+                    map[j].push(-1)
+                }
+            }
+        }
+        my = map[0].length
+        if(mx % 4 != 0){
+            for(var i = 0; i < 4 - mx % 4; i++){
+                var add = new Array(my).fill(-1)
+                map.push(add)
+            }
+        }
+        mx = map.length
+        var sy = Math.floor(my / 4)
+        var new_data = []
+        for(var i = 0; i < mx; i++){
+            let line =[]
+            for(var j = 0; j < sy; j++){
+                let ph = Infinity
+                if(map[i][j * 4] >= 0)
+                    ph = Math.min(map[i][j * 4], ph)
+                if(map[i][j * 4 + 1] >= 0)
+                    ph = Math.min(map[i][j * 4 + 1], ph)
+                if(map[i][j * 4 + 2] >= 0)
+                    ph = Math.min(map[i][j * 4 + 2], ph)
+                if(map[i][j * 4 + 3] >= 0)
+                    ph = Math.min(map[i][j * 4 + 3], ph)
+                if(ph != Infinity)
+                    line.push(ph)
+                else
+                    line.push(-1)
+            }
+            new_data.push(line)
+        }
+        var sx = Math.floor(mx / 4)
+        my = new_data[0].length
+        var final = []
+        for(var i = 0; i < sx; i++){
+            let line = []
+            for(var j = 0; j < my; j++){
+                let ph = Infinity
+                if(new_data[i * 4][j] >= 0)
+                    ph = Math.min(new_data[i * 4][j], ph)
+                if(new_data[i * 4 + 1][j] >= 0)
+                    ph = Math.min(new_data[i * 4 + 1][j], ph)
+                if(new_data[i * 4 + 2][j] >= 0)
+                    ph = Math.min(new_data[i * 4 + 2][j], ph)
+                if(new_data[i * 4 + 3][j] >= 0)
+                    ph = Math.min(new_data[i * 4 + 3][j], ph)
+                if(ph != Infinity)
+                    line.push(ph)
+                else
+                    line.push(-1)
+            }
+            final.push(line)
+        }
+        // this.exportCSV(final)
+        return final
+    }
     // init_smoke(pos){// 生成第一个粒子
     //     const vertexShader = `
     //         uniform float pixelRatio; // 设备像素比例
@@ -276,6 +397,7 @@ export class smokemap{
 
     update(delta = 0.01){
         this.smoke_plane.update(delta)
+        this.fire_t.update(50)
     }
 
     reQ(smoke_Q){
@@ -294,6 +416,8 @@ class ceil
         this.child=[]
         if(ph == 0)
             this.ph = 1
+        // else if(ph == -1)
+        //     this.ph = -2
         else
             this.ph = -1
         // this.added = false
@@ -380,6 +504,97 @@ class ceil
 const noise = new THREE.TextureLoader().load( 'textures/cloud.png' );
 const smoke_t = new THREE.TextureLoader().load('textures/pur.jpg' )
 smoke_t.wrapS = smoke_t.wrapT = THREE.MirroredRepeatWrapping
+const heightmapFragmentShader = `
+    #include <common>
+
+    uniform float smokeQ;
+    uniform float time;
+
+    void main()	{
+        // 获取坐标
+        vec2 cellSize = 1.0 / resolution.xy;
+        vec2 uv = gl_FragCoord.xy * cellSize;
+
+        // 获取周围节点
+        vec4 point = texture2D(heightmap, uv);
+        vec4 n_0 = texture2D(heightmap, uv + vec2(-cellSize.x, cellSize.y));
+        vec4 n_1 = texture2D(heightmap, uv + vec2(0.0, cellSize.y));
+        vec4 n_2 = texture2D(heightmap, uv + vec2(cellSize.x, cellSize.y));
+        vec4 n_3 = texture2D(heightmap, uv + vec2(cellSize.x, 0.0));
+        vec4 n_4 = texture2D(heightmap, uv + vec2(cellSize.x, -cellSize.y));
+        vec4 n_5 = texture2D(heightmap, uv + vec2(0.0, -cellSize.y));
+        vec4 n_6 = texture2D(heightmap, uv + vec2(-cellSize.x, -cellSize.y));
+        vec4 n_7 = texture2D(heightmap, uv + vec2(-cellSize.x, 0.0));
+        
+        // 计算烟雾浓度值
+        // float pa = mod(point.a, 100.0);
+        // if ( pa < 1.0 ) {
+            if(point.a < 1.0) {
+                if (point.b > 0.0 && point.r >= 1.0) {
+                    float added = (smokeQ + 1.0) / point.r;
+                    if(added >= 0.1) {
+                        point.a += added;
+                    }
+                    if(point.r >= point.b + 1.0) {
+                        point.r -= point.b;
+                    }else {
+                        point.r = 1.0;
+                    }
+                    if (point.a >= 1.0) {
+                        point.r = 1.0;
+                        float count = 0.0;
+                        if (n_0.a < 1.0 && n_0.r >= 1.0) { count += 1.0; }
+                        if (n_1.a < 1.0 && n_1.r >= 1.0) { count += 1.0; }
+                        if (n_2.a < 1.0 && n_2.r >= 1.0) { count += 1.0; }
+                        if (n_3.a < 1.0 && n_3.r >= 1.0) { count += 1.0; }
+                        if (n_4.a < 1.0 && n_4.r >= 1.0) { count += 1.0; }
+                        if (n_5.a < 1.0 && n_5.r >= 1.0) { count += 1.0; }
+                        if (n_6.a < 1.0 && n_6.r >= 1.0) { count += 1.0; }
+                        if (n_7.a < 1.0 && n_7.r >= 1.0) { count += 1.0; }
+                        point.b = -1.0 * count * (smokeQ + 1.0);
+                    }
+                } 
+                if(point.b == 0.0 && point.r >= 1.0) {
+                    float if_c = -1.0;
+                    if(n_0.b < 0.0){ point.b += smokeQ + 1.0; if_c = min(if_c, n_0.b); }
+                    if(n_1.b < 0.0){ point.b += smokeQ + 1.0; if_c = min(if_c, n_1.b); }
+                    if(n_2.b < 0.0){ point.b += smokeQ + 1.0; if_c = min(if_c, n_2.b); }
+                    if(n_3.b < 0.0){ point.b += smokeQ + 1.0; if_c = min(if_c, n_3.b); }
+                    if(n_4.b < 0.0){ point.b += smokeQ + 1.0; if_c = min(if_c, n_4.b); }
+                    if(n_5.b < 0.0){ point.b += smokeQ + 1.0; if_c = min(if_c, n_5.b); }
+                    if(n_6.b < 0.0){ point.b += smokeQ + 1.0; if_c = min(if_c, n_6.b); }
+                    if(n_7.b < 0.0){ point.b += smokeQ + 1.0; if_c = min(if_c, n_7.b); }
+                    point.r = if_c * -1.0;
+                }
+            }
+            // else {
+            //     float count = 0.0;
+            //     if (n_0.b < 0.0 || n_0.r < 0.0) { count += 1.0; }
+            //     if (n_1.b < 0.0 || n_1.r < 0.0) { count += 1.0; }
+            //     if (n_2.b < 0.0 || n_2.r < 0.0) { count += 1.0; }
+            //     if (n_3.b < 0.0 || n_3.r < 0.0) { count += 1.0; }
+            //     if (n_4.b < 0.0 || n_4.r < 0.0) { count += 1.0; }
+            //     if (n_5.b < 0.0 || n_5.r < 0.0) { count += 1.0; }
+            //     if (n_6.b < 0.0 || n_6.r < 0.0) { count += 1.0; }
+            //     if (n_7.b < 0.0 || n_7.r < 0.0) { count += 1.0; }
+            //     if (count == 8.0) {
+            //         point.b = smokeQ + 1.0;
+            //     }
+                
+            // }
+        // }
+        else {
+            point.a += 1.0;
+        }
+
+        vec2 neuv = uv + vec2(cellSize.x, 0.0);
+        if(neuv.x > 1.0){
+            neuv.x = 0.0;
+        }
+        point.g = texture2D(heightmap, neuv).g;
+        gl_FragColor = point;
+    }
+`;
 class smokeplane
 {
     // constructor(map, map_edges, point, scene, renderer){
@@ -491,7 +706,7 @@ class smokeplane
     //             vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
     //             vOrigin = vec3( inverse( modelMatrix ) * vec4( cameraPos, 1.0 ) ).xyz;
-    //             vDirection = position - vOrigin;
+    //             vDirection =  position - vec3(0.0,1.0,0.0);
 
     //             gl_Position = projectionMatrix * mvPosition;
     //         }
@@ -576,6 +791,7 @@ class smokeplane
 
     //     this.waterMesh = new THREE.Mesh( geometry, material );
     //     this.waterMesh.scale.set(LENGTH, WIDTH, HEIGHT)
+    //     this.waterMesh.position.set(0,0,550)
     //     scene.add(this.waterMesh)
 
     //     this.gpuCompute = new GPUComputationRenderer( LENGTH, WIDTH, renderer );
@@ -591,116 +807,31 @@ class smokeplane
     //         console.error( error );
     // }
     constructor(map, map_edges, point, scene, renderer){
-        const heightmapFragmentShader = `
-            #include <common>
-
-            uniform float smokeQ;
-            uniform float time;
-
-            void main()	{
-                // 获取坐标
-                vec2 cellSize = 1.0 / resolution.xy;
-                vec2 uv = gl_FragCoord.xy * cellSize;
-
-                // 获取周围节点
-                vec4 point = texture2D(heightmap, uv);
-                vec4 n_0 = texture2D(heightmap, uv + vec2(-cellSize.x, cellSize.y));
-                vec4 n_1 = texture2D(heightmap, uv + vec2(0.0, cellSize.y));
-                vec4 n_2 = texture2D(heightmap, uv + vec2(cellSize.x, cellSize.y));
-                vec4 n_3 = texture2D(heightmap, uv + vec2(cellSize.x, 0.0));
-                vec4 n_4 = texture2D(heightmap, uv + vec2(cellSize.x, -cellSize.y));
-                vec4 n_5 = texture2D(heightmap, uv + vec2(0.0, -cellSize.y));
-                vec4 n_6 = texture2D(heightmap, uv + vec2(-cellSize.x, -cellSize.y));
-                vec4 n_7 = texture2D(heightmap, uv + vec2(-cellSize.x, 0.0));
-                
-                // 计算烟雾浓度值
-                float pa = mod(point.a, 100.0);
-                if ( pa < 1.0 ) {
-                    if(point.a < 100.0) {
-                        if (point.b > 0.0 && point.r >= 1.0) {
-                            float added = (smokeQ + 1.0) / point.r;
-                            if(added >= 0.1) {
-                                point.a += added;
-                            }
-                            if(point.r >= point.b + 1.0) {
-                                point.r -= point.b;
-                            }else {
-                                point.r = 1.0;
-                            }
-                            if (point.a >= 1.0) {
-                                point.r = 1.0;
-                                float count = 0.0;
-                                if (n_0.a < 1.0 && n_0.r >= 1.0) { count += 1.0; }
-                                if (n_1.a < 1.0 && n_1.r >= 1.0) { count += 1.0; }
-                                if (n_2.a < 1.0 && n_2.r >= 1.0) { count += 1.0; }
-                                if (n_3.a < 1.0 && n_3.r >= 1.0) { count += 1.0; }
-                                if (n_4.a < 1.0 && n_4.r >= 1.0) { count += 1.0; }
-                                if (n_5.a < 1.0 && n_5.r >= 1.0) { count += 1.0; }
-                                if (n_6.a < 1.0 && n_6.r >= 1.0) { count += 1.0; }
-                                if (n_7.a < 1.0 && n_7.r >= 1.0) { count += 1.0; }
-                                point.b = -1.0 * count * (smokeQ + 1.0);
-                            }
-                        } 
-                        if(point.b == 0.0 && point.r >= 1.0) {
-                            float if_c = -1.0;
-                            if(n_0.b < 0.0){ point.b += smokeQ + 1.0; if_c = min(if_c, n_0.b); }
-                            if(n_1.b < 0.0){ point.b += smokeQ + 1.0; if_c = min(if_c, n_1.b); }
-                            if(n_2.b < 0.0){ point.b += smokeQ + 1.0; if_c = min(if_c, n_2.b); }
-                            if(n_3.b < 0.0){ point.b += smokeQ + 1.0; if_c = min(if_c, n_3.b); }
-                            if(n_4.b < 0.0){ point.b += smokeQ + 1.0; if_c = min(if_c, n_4.b); }
-                            if(n_5.b < 0.0){ point.b += smokeQ + 1.0; if_c = min(if_c, n_5.b); }
-                            if(n_6.b < 0.0){ point.b += smokeQ + 1.0; if_c = min(if_c, n_6.b); }
-                            if(n_7.b < 0.0){ point.b += smokeQ + 1.0; if_c = min(if_c, n_7.b); }
-                            point.r = if_c * -1.0;
-                        }
-                    }
-                    // else {
-                    //     float count = 0.0;
-                    //     if (n_0.b < 0.0 || n_0.r < 0.0) { count += 1.0; }
-                    //     if (n_1.b < 0.0 || n_1.r < 0.0) { count += 1.0; }
-                    //     if (n_2.b < 0.0 || n_2.r < 0.0) { count += 1.0; }
-                    //     if (n_3.b < 0.0 || n_3.r < 0.0) { count += 1.0; }
-                    //     if (n_4.b < 0.0 || n_4.r < 0.0) { count += 1.0; }
-                    //     if (n_5.b < 0.0 || n_5.r < 0.0) { count += 1.0; }
-                    //     if (n_6.b < 0.0 || n_6.r < 0.0) { count += 1.0; }
-                    //     if (n_7.b < 0.0 || n_7.r < 0.0) { count += 1.0; }
-                    //     if (count == 8.0) {
-                    //         point.b = smokeQ + 1.0;
-                    //     }
-                        
-                    // }
-                }else {
-                    point.a += 1.0;
-                }
-
-                vec2 neuv = uv + vec2(cellSize.x, 0.0);
-                if(neuv.x > 1.0){
-                    neuv.x = 0.0;
-                }
-                point.g = texture2D(heightmap, neuv).g;
-                gl_FragColor = point;
-            }
-        `;
-
+        this.idjlaf =0
+        this.scene =scene
+        this.camera = window.camera
+        this.renderer = renderer
         const waterVertexShader = `
             uniform sampler2D heightmap;
             varying vec2 vUv;
             uniform float time;
             varying float op;
             varying float heightValue;
-            uniform float id;
 
             void main() {
                 vUv = uv;
 
                 heightValue = texture2D(heightmap, uv).g ;
                 vec3 transformed = vec3(position.x, position.y, heightValue);
-                op = texture2D(heightmap, uv).a / 100.0 ;
-                if(op < 0.1){
-                    op = 0.0;
-                }
-                // if(op > 0.9){
-                //     op = 0.9;
+                op = texture2D(heightmap, uv).a / 200.0 ;
+                // if(op < 0.3 && op > 0.0){
+                //     op = 0.2;
+                // }else if(op > 1.0){
+                //     op = 0.95;
+                // }else if(op > 0.0 && op < 0.8){
+                //     op = 0.6;
+                // }else if(op > 0.0 && op < 0.5){
+                //     op = 0.5;
                 // }
                 // 将 transformed 作为最终的顶点位置
                 gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
@@ -714,13 +845,13 @@ class smokeplane
             uniform float time;
             varying float op;
             varying float heightValue;
-            uniform float id;
 
             void main() {
                 vec2 T2 = vUv + vec2(-0.5, 2.0) * time * 0.05;
                 vec4 color = texture2D(texture2, T2 * 2.0);
-
+                // vec4 color = texture2D(texture2, vUv);
                 // 输出最终颜色和透明度
+                // vec3 color = (1.0 - vec3(0.1) * op * 10.0);
                 gl_FragColor = vec4(color.rgb, op);
             }
         `;
@@ -743,7 +874,7 @@ class smokeplane
                     'texture1': { value: noise },
                     'texture2': { value: smoke_t },
                     'time': { value: 1.0 },
-                    'id': { value: 1.0 }
+                    'smokeQ': { value: 0.0 }
                 }
             ] ),
             vertexShader: waterVertexShader,
@@ -753,8 +884,14 @@ class smokeplane
             side: THREE.DoubleSide
         } );
 
-        this.waterMesh = new THREE.Mesh( geometry, material );
+        this.waterMesh = new THREE.InstancedMesh( geometry, material, 5);
         this.waterMesh.position.set(0,0,550);
+        for(let i = 0; i < 5; i++){
+            const position = new THREE.Vector3(0,0,545+i)
+            const quaternion = new THREE.Quaternion()
+            const scale = new THREE.Vector3(1,1,1)
+            this.waterMesh.setMatrixAt(i, new THREE.Matrix4().compose(position,quaternion,scale))
+        }
         this.waterMesh.updateMatrix();
         this.gpuCompute = new GPUComputationRenderer( LENGTH, WIDTH, renderer );
         if ( renderer.capabilities.isWebGL2 === false ) 
@@ -764,24 +901,25 @@ class smokeplane
         this.fillTexture( heightmap0, map, point );
         this.heightmapVariable = this.gpuCompute.addVariable( 'heightmap', heightmapFragmentShader, heightmap0 );
         this.gpuCompute.setVariableDependencies( this.heightmapVariable, [ this.heightmapVariable ] );
-        this.heightmapVariable.material.uniforms[ 'smokeQ' ] = { value: 0.0 };
         const error = this.gpuCompute.init();
         if ( error !== null ) 
             console.error( error );
-        // var testMesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({color:0xffffff}) );
-        // testMesh.position.set(0,0,490)
-        // scene.add(testMesh)
         scene.add(this.waterMesh)
         for(var i = 0; i < 10; i++){
             let me = this.waterMesh.clone()
-            me.position.set(0,0,550-i);
+            me.position.set(0,0,550-i/2);
             scene.add(me)
         }
     }
     update(delta){
-        console.log(delta)
         this.gpuCompute.compute();
-        // this.waterMesh.material.uniforms.cameraPos.value.copy( camera.position );
+        this.gpuCompute.compute();
+        this.gpuCompute.compute();
+        this.gpuCompute.compute();
+        this.gpuCompute.compute();
+        // this.idjlaf++
+        // if(this.idjlaf==10)
+        //     this.fire_alarm([1800, 1000])
         this.waterMesh.material.uniforms[ 'heightmap' ].value = this.gpuCompute.getCurrentRenderTarget( this.heightmapVariable ).texture;
         this.waterMesh.material.uniforms[ 'time' ].value += delta;
     }
@@ -789,6 +927,53 @@ class smokeplane
         let Q = smoke_Q - 1.0
         this.heightmapVariable.material.uniforms[ 'smokeQ' ].value.set(Q)
     }
+    fire_alarm(point){
+        var pos = [Math.floor(point.x+1322), Math.floor(point.y+768)]
+        console.log(pos)
+        const texture = this.gpuCompute.getCurrentRenderTarget(this.heightmapVariable);
+        const renderer = this.renderer;
+        const width = texture.texture.image.width;
+        const height = texture.texture.image.height;
+        var pixelData = new Float32Array(width * height * 4);
+        renderer.readRenderTargetPixels(texture, 0, 0, width, height, pixelData);
+
+        let mubiao = pixelData[(pos[1]*width+pos[0])*4+3]
+        console.log(mubiao)
+            for (var x = 0; x < width; x++) {
+                for (var y = 0; y < height; y++) {
+                    var index = (y * width + x) * 4 + 3;
+                    if(pixelData[index] == mubiao){
+                        pixelData[index] = 1.0
+                    }
+                    else if(pixelData[index] < mubiao){
+                        pixelData[index] = 0.0
+                        pixelData[index-1] = 0.0
+                    }
+                    else{
+                        pixelData[index] -= mubiao
+                    }
+                }
+            }
+        
+        // else{
+        //     for (var x = 0; x < width; x++) {
+        //         for (var y = 0; y < height; y++) {
+        //             var index = (y * width + x) * 4 + 3;
+        //             if(pixelData[index] <= 1.0){
+
+        //             }
+        //         }
+        //     }
+        // }
+        var newmap = this.gpuCompute.createTexture();
+        newmap.image.data = pixelData
+
+        this.gpuCompute.dispose()
+        this.heightmapVariable = this.gpuCompute.addVariable( 'heightmap', heightmapFragmentShader, newmap );
+        this.gpuCompute.setVariableDependencies( this.heightmapVariable, [ this.heightmapVariable ] );
+        this.gpuCompute.init();
+        this.gpuCompute.compute()
+     }
     fillTexture(texture, map, point) {// 要求map为建筑物时为-1，非建筑物为1，且point处不是建筑物
         // r:建筑物信息 g:随机高度信息 b:是否为当前正在扩散的烟雾格子 a:烟雾浓度信息
         let pixels = texture.image.data;
@@ -804,26 +989,19 @@ class smokeplane
                 multR *= 0.53 + 0.025 * i;
                 mult *= 1.25;
             }
-
             return r;
         }
 
         const rows = map.length;
         const cols = map[0].length;
-
         for (let i = 0; i < cols; i++) {
-            let rani = Math.sin(Math.sin(i/10))
             for (let j = 0; j < rows; j++) {
-                let redValue = map[j][i].ph.toFixed(1);
+                let redValue = map[j][i] > 0 ? 1.0 : 0.0
                 let greenValue = noise(i.toFixed(1), j.toFixed(1)); 
-                // let greenValue = Math.random()*0.39+0.61; 
                 let blueValue = 0.0; 
-                let alphaValue = 0.0;
-                if(point[0] == j && point[1] == i){
+                if(point[0] == j && point[1] == i)
                     blueValue = 1.0
-                    alphaValue = 0.0
-                }
-
+                let alphaValue = 0.0;
                 pixels[p + 0] = redValue; 
                 pixels[p + 1] = greenValue; 
                 pixels[p + 2] = blueValue; 
