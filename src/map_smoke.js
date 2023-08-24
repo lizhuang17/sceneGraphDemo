@@ -9,7 +9,7 @@ export class smokemap{
         this.map = []
         this.final = []
         this.maps=new escapmap()
-        this.map_edges = []
+        this.map_edges = [1321,-1322,786,-751,481]
         this.grids = undefined
         this.meshs = undefined
         this.rm = undefined
@@ -24,36 +24,51 @@ export class smokemap{
         this.dops = []// 变化的块的变化程度
         this.smoke_Q = 10000
         this.finish_load = false
+        this.texture_data = new Float32Array(2643*1537*4)
+        this.simplex = new SimplexNoise()
         let self = this
         const loader = new THREE.FileLoader();
         loader.load('KaiLiNan.csv', function (value) {
-            let i = 0;
+            let i = 0
+            let x = 0
             value.split('\n').forEach(function(v){
-                if(i == 0){
-                    v.split(',').forEach(function(w){
-                        self.map_edges.push(parseInt(w))
-                    });
-                    i += 1
-                }else{
-                    let line = []
-                    v.split(',').forEach(function(w){
-                        line.push(parseInt(w))
-                    });
-                    if(line.length > 5)
-                        self.map.push(line)
+                let line = []
+                let y = 0
+                v.split(',').forEach(function(w){
+                    let p = (y*2643+x)*4
+                    let wall = parseInt(w) > 0 ? 1.0 : 0.0
+                    self.texture_data[p]=wall
+                    self.texture_data[p+1]=self.noise(x,y)
+                    y++
+                    line.push(parseInt(w))
+                });
+                if(line.length > 6){
+                    self.map.push(line)
+                    x++
                 }
             });
         })  
-        loader.load('KaiLiNan4-1.csv', function (value) {
-            value.split('\n').forEach(function(v){
-                let line = []
-                v.split(',').forEach(function(w){
-                    line.push(parseInt(w))
-                });
-                if(line.length > 6)
-                    self.final.push(line)
-            });
-        }) 
+        // loader.load('KaiLiNan4-1.csv', function (value) {
+        //     value.split('\n').forEach(function(v){
+        //         let line = []
+        //         v.split(',').forEach(function(w){
+        //             line.push(parseInt(w))
+        //         });
+        //         if(line.length > 6)
+        //             self.final.push(line)
+        //     });
+        // }) 
+    }
+    noise( x, y ) {    
+        let multR = 3;
+        let mult = 0.025;
+        let r = 0;
+        for ( let i = 0; i < 15; i ++ ) {
+            r += multR * this.simplex.noise( x * mult, y * mult );
+            multR *= 0.53 + 0.025 * i;
+            mult *= 1.25;
+        }
+        return r;
     }
     init(renderer, pos = [1800, 1000]){//[815, 320]
         {
@@ -86,7 +101,9 @@ export class smokemap{
             // wall.rotation.set(Math.PI/2,0,0)
             // // self.scene.add(wall)
         }
-        this.smoke_plane = new smokeplane(this.map, this.map_edges, pos, this.scene, renderer)
+        const LENGTH = this.map_edges[0]-this.map_edges[1]
+        this.texture_data[(pos[1] * LENGTH + pos[0]) * 4 + 2] = 1.0
+        this.smoke_plane = new smokeplane(this.map_edges, this.texture_data, this.scene, renderer)
         this.maps.init(this.final,this.scene)
 
         this.firemap = new THREE.TextureLoader().load('textures/fire.webp')
@@ -806,7 +823,8 @@ class smokeplane
     //     if ( error !== null ) 
     //         console.error( error );
     // }
-    constructor(map, map_edges, point, scene, renderer){
+    constructor(map_edges, map_data, scene, renderer){
+
         this.idjlaf =0
         this.scene =scene
         this.camera = window.camera
@@ -860,7 +878,7 @@ class smokeplane
         const LENGTH = (this.map_edges[0]-this.map_edges[1])/1.0
         const WIDTH = (this.map_edges[2]-this.map_edges[3])/1.0
         
-        console.log(LENGTH, WIDTH)
+        // console.log(LENGTH, WIDTH)
         const geometry = new THREE.PlaneGeometry( LENGTH, WIDTH, LENGTH - 1, WIDTH - 1 );
         
         noise.wrapS=noise.wrapT=THREE.MirroredRepeatWrapping
@@ -898,18 +916,19 @@ class smokeplane
             this.gpuCompute.setDataType( THREE.HalfFloatType );
         
         const heightmap0 = this.gpuCompute.createTexture();
-        this.fillTexture( heightmap0, map, point );
+        // console.log(heightmap0.image.data.length, map_data.length)
+        heightmap0.image.data = map_data
         this.heightmapVariable = this.gpuCompute.addVariable( 'heightmap', heightmapFragmentShader, heightmap0 );
         this.gpuCompute.setVariableDependencies( this.heightmapVariable, [ this.heightmapVariable ] );
         const error = this.gpuCompute.init();
         if ( error !== null ) 
             console.error( error );
         scene.add(this.waterMesh)
-        for(var i = 0; i < 10; i++){
-            let me = this.waterMesh.clone()
-            me.position.set(0,0,550-i/2);
-            scene.add(me)
-        }
+        // for(var i = 0; i < 10; i++){
+        //     let me = this.waterMesh.clone()
+        //     me.position.set(0,0,550-i/2);
+        //     scene.add(me)
+        // }
     }
     update(delta){
         this.gpuCompute.compute();
@@ -936,7 +955,6 @@ class smokeplane
         const height = texture.texture.image.height;
         var pixelData = new Float32Array(width * height * 4);
         renderer.readRenderTargetPixels(texture, 0, 0, width, height, pixelData);
-
         let mubiao = pixelData[(pos[1]*width+pos[0])*4+3]
         console.log(mubiao)
             for (var x = 0; x < width; x++) {
@@ -977,6 +995,7 @@ class smokeplane
     fillTexture(texture, map, point) {// 要求map为建筑物时为-1，非建筑物为1，且point处不是建筑物
         // r:建筑物信息 g:随机高度信息 b:是否为当前正在扩散的烟雾格子 a:烟雾浓度信息
         let pixels = texture.image.data;
+
         let p = 0;
         let simplex = new SimplexNoise()
         function noise( x, y ) {

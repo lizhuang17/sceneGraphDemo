@@ -128,7 +128,12 @@ export class Viewer
         var _self = this
         this.map = new smokemap(this.sceneEx)
         this.people = new AvatarManager(this.sceneEx, this.defaultCamera, this.map.maps)
-
+        this.globalPlane = new THREE.Plane( new THREE.Vector3( 0, 0, -1 ), 0.1 );
+        this.globalPlane.constant =10000;//剖切的位置
+        this.renderer.clippingPlanes.push(this.globalPlane);
+        this.renderer.localClippingEnabled = true;
+        this.cp_o = null
+        this.cr_o = null
         this.ifsmoke = 1
         this.ifpeople = 1
         this.vis = false
@@ -389,15 +394,12 @@ export class Viewer
         requestAnimationFrame(this.animate)
 
         this.stats.update()
-        setInterval(() => {
-            if(this.map.map.length != 0 && !this.map.finish_load)
-                this.map.init(this.renderer)
-            if(this.map.maps.finish_load && this.map.finish_load && this.people.seted){
-                this.people.setPos()
-                this.start_button.style.display="block"
-            }
-        }, 1000);
-        
+        if(this.map.map.length != 0 && !this.map.finish_load)
+            this.map.init(this.renderer)
+        if(this.map.maps.finish_load && this.map.finish_load && this.people.seted){
+            this.people.setPos()
+            this.start_button.style.display="block"
+        }
         if(this.ifpeople != 0 && this.ifpeople % 2 == 0)
             this.people.update()
         if(this.ifsmoke != 0 && this.ifsmoke % 2 == 0)
@@ -433,6 +435,22 @@ export class Viewer
             width/4, height/20,
             width/50,13.5*height/15,()=>{
             this.vis = !this.vis
+            if(this.vis){
+                this.globalPlane.constant =549
+                this.cp_o = [this.defaultCamera.position.x,this.defaultCamera.position.y,this.defaultCamera.position.z]
+                this.cr_o = [this.defaultCamera.rotation.x,this.defaultCamera.rotation.y,this.defaultCamera.rotation.z]
+                this.defaultCamera.position.set(127,56,1543)
+                this.defaultCamera.lookAt(127,56,480)
+                this.ifpeople+=1
+                this.ifsmoke+=1
+            }
+            else{
+                this.defaultCamera.position.copy(new THREE.Vector3(this.cp_o[0], this.cp_o[1], this.cp_o[2]))
+                this.defaultCamera.rotation.set(this.cr_o[0], this.cr_o[1], this.cr_o[2])
+                this.globalPlane.constant = 10000
+                this.ifpeople+=1
+                this.ifsmoke+=1
+            }
         });
         new ui.Button("Follow escapee", "#F4A460", '#F4A430', '#FFD700',
         height/40, 10,

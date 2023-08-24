@@ -13,32 +13,51 @@ export class escapmap{
     }
     init(map, scene=null){
         let floor = []
-        for(var x = 0; x < map.length; x++){
-            let row = []
-            for(var y = 0; y < map[x].length; y++){
-                row.push(new ceil(map[x][y], [x,y]))
-            }
-            floor.push(row)
-        }
+        let self = this
+        const loader = new THREE.FileLoader();
+        loader.load('KaiLiNan4-1.csv', function (value) {
+            let x = 0
+            value.split('\n').forEach(function(v){
+                let y = 0
+                let line = []
+                v.split(',').forEach(function(w){
+                    line.push(new ceil(parseInt(w),[x,y]))
+                    y++
+                });
+                if(line.length > 6){
+                    self.grids.push(line)
+                    x++
+                }
+            });
+            self.finish_load = true
+        }) 
+        // for(var x = 0; x < map.length; x++){
+        //     let row = []
+        //     for(var y = 0; y < map[x].length; y++){
+        //         row.push(new ceil(map[x][y], [x,y]))
+        //     }
+        //     // floor.push(row)
+        //     this.grids.push(row)
+        // }
 
-        const ball = new THREE.BufferGeometry()
-        const ball_v = []
-        const circleRadius = 1.0; // 圆片的半径
-        const circleSegments = 32; // 圆片的分段数
-        for (let i = 0; i <= circleSegments; i++) {
-            const theta = (i / circleSegments) * Math.PI * 2; // 计算当前分段的角度
-            const x = Math.cos(theta) * circleRadius; // 计算当前分段的x坐标
-            const y = Math.sin(theta) * circleRadius; // 计算当前分段的y坐标
-            ball_v.push(x, y, 0); // 将顶点坐标添加到数组中
-        }
+        // const ball = new THREE.BufferGeometry()
+        // const ball_v = []
+        // const circleRadius = 1.0; // 圆片的半径
+        // const circleSegments = 32; // 圆片的分段数
+        // for (let i = 0; i <= circleSegments; i++) {
+        //     const theta = (i / circleSegments) * Math.PI * 2; // 计算当前分段的角度
+        //     const x = Math.cos(theta) * circleRadius; // 计算当前分段的x坐标
+        //     const y = Math.sin(theta) * circleRadius; // 计算当前分段的y坐标
+        //     ball_v.push(x, y, 0); // 将顶点坐标添加到数组中
+        // }
 
-        const positions = new Float32Array(ball_v); // 创建Float32Array类型的顶点坐标数组
-        ball.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-		const ball_m = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
-		this.balls = new THREE.InstancedMesh( ball, ball_m, 10000)
+        // const positions = new Float32Array(ball_v); // 创建Float32Array类型的顶点坐标数组
+        // ball.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+		// const ball_m = new THREE.MeshBasicMaterial( { color: 0x00ff00 } )
+		// this.balls = new THREE.InstancedMesh( ball, ball_m, 10000)
         
-        this.grids.push(this.link(floor))
-        this.finish_load = true
+        // this.grids.push(this.link(floor))
+
     }
     link(grid){
         /*  1|2|3
@@ -84,6 +103,92 @@ export class escapmap{
                 scale.x = scale.y = scale.z = 1;
                 matrix.compose( position, quaternion, scale );
     }
+    nextstep(pos, e){
+        let n = Infinity
+        let next = [pos[0],pos[1]]
+        let x = next[0]
+        let y = next[1]
+        let alph = this.grids[x][y].ph0
+        var n1,n2,n3,n4,n5,n6,n7,n8 = null
+        let o = -1
+        try{n1=this.grids[x-1][y+1].ph;if(n1==undefined || n1<0)n1 = Infinity;else if(n1>0&&n1<alph)n1=(n1*e+(1-e)*this.grids[x-1][y+1].know)*1}catch{var n1 = Infinity;}
+        try{n2=this.grids[x][y+1].ph;if(n2==undefined || n2<0)n2 = Infinity;else if(n2>0&&n1<alph)n2=n2*e+(1-e)*this.grids[x][y+1].know}catch{var n2 = Infinity;}
+        try{n3=this.grids[x+1][y+1].ph;if(n3==undefined || n3<0)n3 = Infinity;else if(n3>0&&n1<alph)n3=(n3*e+(1-e)*this.grids[x+1][y+1].know)*1}catch{var n3 = Infinity;}
+        try{n4=this.grids[x+1][y].ph;if(n4==undefined || n4<0)n4 = Infinity;else if(n4>0&&n1<alph)n4=n4*e+(1-e)*this.grids[x+1][y].know}catch{var n4 = Infinity;}
+        try{n5=this.grids[x+1][y-1].ph;if(n5==undefined || n5<0)n5 = Infinity;else if(n5>0&&n1<alph)n5=(n5*e+(1-e)*this.grids[x+1][y-1].know)*1}catch{var n5 = Infinity;}
+        try{n6=this.grids[x][y-1].ph;if(n6==undefined || n6<0)n6 = Infinity;else if(n6>0&&n1<alph)n6=n6*e+(1-e)*this.grids[x][y-1].know}catch{var n6 = Infinity;}
+        try{n7=this.grids[x-1][y-1].ph;if(n7==undefined || n7<0)n7 = Infinity;else if(n7>0&&n1<alph)n7=(n7*e+(1-e)*this.grids[x-1][y-1].know)*1}catch{var n7 = Infinity;}
+        try{n8=this.grids[x-1][y].ph;if(n8==undefined || n8<0)n8 = Infinity;else if(n8>0&&n1<alph)n8=n8*e+(1-e)*this.grids[x-1][y].know}catch{var n8 = Infinity;}
+        if(n && n > n1) {n = n1; o=0}
+        if(n && n > n2) {n = n2; o=1}
+        if(n && n > n3) {n = n3; o=2}
+        if(n && n > n4) {n = n4; o=3}
+        if(n && n > n5) {n = n5; o=4}
+        if(n && n > n6) {n = n6; o=5}
+        if(n && n > n7) {n = n7; o=6}
+        if(n && n > n8) {n = n8; o=7}
+        
+        let new_e = e
+        let child = null 
+        switch(o){
+            case 0:
+                child = this.grids[x-1][y+1]
+                next[0]-=1
+                next[1]+=1
+                break
+            case 1:
+                child = this.grids[x][y+1]
+                next[1]+=1
+                break
+            case 2:
+                child = this.grids[x+1][y+1]
+                next[0]+=1
+                next[1]+=1
+                break
+            case 3:
+                child = this.grids[x+1][y]
+                next[0]+=1
+                break
+            case 4:
+                child = this.grids[x+1][y-1]
+                next[0]+=1
+                next[1]-=1
+                break
+            case 5:
+                child = this.grids[x][y-1]
+                next[1]-=1
+                break
+            case 6:
+                child = this.grids[x-1][y-1]
+                next[0]-=1
+                next[1]-=1
+                break
+            case 7:
+                child = this.grids[x-1][y]
+                next[0]-=1
+                break
+            default:
+                child = this.grids[x][y]
+                break
+        } 
+        if(this.know > e)
+            new_e = e
+        if(this.grids[x][y].ph0 > child.ph0)
+            this.grids[x][y].know += e
+        child.setpeople(this.grids[x][y].people, o)
+        this.grids[x][y].people=-1
+        this.grids[x][y].ph=this.grids[x][y].ph0
+        this.grids[x][y].ore = -1
+        return [o, this.grids[x][y].ph0, next[0], next[1], 481, new_e]
+    }
+    set_ext(ext){
+        this.ext = ext
+        if(ext < 100)
+            this.child.forEach(function(e){
+                if(e && e.ext>ext)
+                    e.set_ext(ext+1)
+            })
+    }
 }
 class ceil
 {
@@ -106,10 +211,13 @@ class ceil
             this.child.push(next[i])
         }
     }
-    setpeople(id){
-        this.know *= 3 / 4
-        this.people=id
-        this.ph=-1
+    setpeople(id, o){
+        if(this.ph0 > 0){
+            this.know *= 3 / 4
+            this.people=id
+            this.ph=-1
+            this.ore = o
+        }
         // let count = 0
         // for(var i=0;i<8;i++){
         //     if(this.child[i] && this.child[i].panic){

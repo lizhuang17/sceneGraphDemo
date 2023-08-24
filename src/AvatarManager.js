@@ -28,10 +28,10 @@ export class AvatarManager {
             do{
                 x = Math.floor(Math.random()*(this.map_edges[0][0]-this.map_edges[0][1]-1)/4)
                 y = Math.floor(Math.random()*(this.map_edges[0][2]-this.map_edges[0][3]-1)/4)
-            }while(this.maps.grids[0][x][y].ph <= 0)
-            this.maps.grids[0][x][y].setpeople(i)
+            }while(this.maps.grids[x][y].ph0 <= 0)
+            this.maps.grids[x][y].setpeople(i)
             this.poslist.push([x,y,this.map_edges[0][4]-1])
-            this.phs.push(this.maps.grids[0][x][y].ph0)
+            this.phs.push(this.maps.grids[x][y].ph0)
             this.ids.push(i)
             this.times.push(0)
             this.dp.push([0,0,0])
@@ -325,9 +325,9 @@ export class AvatarManager {
                     de = this.count*this.persent[0]
                 }
             }
-            if(this.poslist[i] ){
+            if(this.poslist[i]){
                 let old = this.poslist[i]
-                let pos = this.maps.grids[0][this.poslist[i][0]][this.poslist[i][1]].nextstep(this.es[i])
+                let pos = this.maps.nextstep(this.poslist[i],this.es[i])
                 this.es[i] = pos.splice(-1,1)[0]
                 let index = 9-pos.splice(0,1)
                 this.phs[i] = pos.splice(0,1)
@@ -336,7 +336,7 @@ export class AvatarManager {
                 this.crowd[n].move(i-de, [this.dp[i][0], this.dp[i][1], 0])
                 if(index <= 9)
                     this.crowd[n].setRotation(i-de, [Math.PI/2, index/4*Math.PI, 0])
-                if(this.maps.grids[0][this.poslist[i][0]][this.poslist[i][1]].ph0==0){
+                if(this.maps.grids[this.poslist[i][0]][this.poslist[i][1]].ph0==0){
                     this.poslist[i]=null
                     this.crowd[n].setRotation(i-de, [Math.PI/2,-Math.PI/2,0])
                 }
@@ -352,7 +352,8 @@ export class AvatarManager {
                         this.ground[i]-=1
                     }
                 }else if(this.ground[i] < 311){
-                    this.crowd[n].move(i-de, [Math.random()*4, (Math.random()-0.5)*8, 0])
+                    this.crowd[n].move(i-de, [10000, 10000, 10000])
+                    this.crowd[n].setScale(i-de, [0,0,0])
                 }
             }
         }
