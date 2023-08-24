@@ -27,27 +27,57 @@ export class smokemap{
         this.texture_data = new Float32Array(2643*1537*4)
         this.simplex = new SimplexNoise()
         let self = this
-        const loader = new THREE.FileLoader();
-        loader.load('KaiLiNan.csv', function (value) {
-            let i = 0
-            let x = 0
-            value.split('\n').forEach(function(v){
-                let line = []
-                let y = 0
-                v.split(',').forEach(function(w){
+        // const loader = new THREE.FileLoader();
+        // loader.load('KaiLiNan.csv', function (value) {
+        //     window.value=value
+        //     let x = 0
+        //     value.split('\n').forEach(function(v){
+        //         let line = []
+        //         let y = 0
+        //         v.split(',').forEach(function(w){
+        //             let p = (y*2643+x)*4
+        //             let wall = parseInt(w) > 0 ? 1.0 : 0.0
+        //             self.texture_data[p]=wall
+        //             self.texture_data[p+1]=self.noise(x,y)
+        //             y++
+        //             line.push(parseInt(w))
+        //         });
+        //         if(line.length > 6){
+        //             self.map.push(line)
+        //             x++
+        //         }
+        //     });
+        //     window.map=self.map
+        // })   
+        loadJson("wall_KaiLiNan.json",data=>{
+            const temp={}
+            for(let p of data)temp[p]=true
+            //行数(2643) [Array(列数 1537)
+            //1321,-1322,786,-751,481
+            self.map=[]
+            for(let x=0;x<2643;x++){
+                const list=[]
+                for(let y=0;y<1537;y++){
                     let p = (y*2643+x)*4
-                    let wall = parseInt(w) > 0 ? 1.0 : 0.0
+                    let wall=temp[p]?1:0
                     self.texture_data[p]=wall
                     self.texture_data[p+1]=self.noise(x,y)
-                    y++
-                    line.push(parseInt(w))
-                });
-                if(line.length > 6){
-                    self.map.push(line)
-                    x++
+                    list.push(temp[p]?1555:-1)
                 }
-            });
-        })  
+                self.map.push(list)
+            }
+        })
+        function loadJson(path,cb){   
+            var xhr = new XMLHttpRequest()
+            xhr.open('GET', path, true)
+            xhr.send()
+            xhr.onreadystatechange = ()=> {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var json_data = JSON.parse(xhr.responseText)
+                    cb(json_data)
+                }
+            }
+        }
         // loader.load('KaiLiNan4-1.csv', function (value) {
         //     value.split('\n').forEach(function(v){
         //         let line = []
@@ -58,6 +88,51 @@ export class smokemap{
         //             self.final.push(line)
         //     });
         // }) 
+        window.save=()=>{
+            self.saveKaiLiNan_csv()
+        }
+    }
+    saveKaiLiNan_csv(){
+        function saveJson(data,name){
+            const jsonData = JSON.stringify(data);
+            const myBlob = new Blob([jsonData], { type: 'application/json' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(myBlob)
+            link.download = name
+            link.click()
+        }
+        const loader = new THREE.FileLoader();
+        loader.load('KaiLiNan.csv', function (value) {
+            const myData=[]
+            window.value=value
+            let x = 0
+            const vAll=value.split('\n')
+            vAll.forEach(v=>{
+                console.log(x,vAll.length)
+                let line = []
+                let y = 0
+                const row=v.split(',')
+                row.forEach(w=>{
+                    let p = (y*2643+x)*4
+                    // let wall = parseInt(w) > 0 ? 1.0 : 0.0
+                    if(row.length>6&&parseInt(w) > 0){
+                        myData.push(p)
+                    }
+                    // self.texture_data[p]=wall
+                    // self.texture_data[p+1]=self.noise(x,y)
+                    y++
+                    // line.push(parseInt(w))
+                });
+                if(line.length > 6){
+                    // self.map.push(line)
+                    x++
+                    console.log(x)
+                }
+            });
+            // window.map=self.map
+            // window.myData=myData
+            saveJson(myData,"wall_KaiLiNan.json")
+        })  
     }
     noise( x, y ) {    
         let multR = 3;
