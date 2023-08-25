@@ -1,5 +1,6 @@
 import {GLTFLoader} from '../lib/three/examples/jsm/loaders/GLTFLoader'
-import { Crowd } from '../lib/crowd/Crowd.js'
+// import { Crowd } from '../lib/crowd/Crowd.js'
+import { Instanced5Object } from '../lib/crowd/Instanced5Object'//let Crowd=Pack// 
 import * as THREE from "three"
 export class AvatarManager {
     constructor(scene, camera, map, count=200) {
@@ -49,7 +50,7 @@ export class AvatarManager {
             self.init(count_i)
             count_i++
             console.log(count_i)
-            if(count_i == 3) clearInterval(interv)
+            if(count_i == 2) clearInterval(interv)
         },500)
     }
     getConfig(i){
@@ -184,64 +185,64 @@ export class AvatarManager {
             "lod_geometry":    [ 20,  15,   1,    0,   0  ],
             "lod_avatarCount": [ 200, 900, 3240, 8800, 12600]
         }
-        const c2={ 
-            "path": [
-                "assets/sim/man02/"
-            ],
-            "pathTexture":[
-                "./assets/textures_sim1/man02/"
-            ],
-            "meshType":[
-                {
-                    "CloM_B_eyeLeft_geo1": "eye",
-                    "CloM_B_eyeRight_geo1": "eye",
-                    "eyelash": "eyelash",
-                    "teeth": null,
-                    "hair": "hair",
-                    "head": "head",
-                    "CloM_B_body_geo": "body",
-                    "CloM_B_chenshan_geo":"coat",
-                    "CloM_B_kuzi_geo": "coat",
-                    "CloM_B_waitao_geo": "coat",
-                    "CloM_B_xie_geo": "shoes"
+        // const c2={ 
+        //     "path": [
+        //         "assets/sim/man02/"
+        //     ],
+        //     "pathTexture":[
+        //         "./assets/textures_sim1/man02/"
+        //     ],
+        //     "meshType":[
+        //         {
+        //             "CloM_B_eyeLeft_geo1": "eye",
+        //             "CloM_B_eyeRight_geo1": "eye",
+        //             "eyelash": "eyelash",
+        //             "teeth": null,
+        //             "hair": "hair",
+        //             "head": "head",
+        //             "CloM_B_body_geo": "body",
+        //             "CloM_B_chenshan_geo":"coat",
+        //             "CloM_B_kuzi_geo": "coat",
+        //             "CloM_B_waitao_geo": "coat",
+        //             "CloM_B_xie_geo": "shoes"
     
-                }
-            ],
-            "lod_visible": [
-                {
-                    "CloM_B_eyeLeft_geo1": 2,
-                    "CloM_B_eyeRight_geo1": 2,
-                    "eyelash": 2,
-                    "hair": 3,
-                    "head": 4,
-                    "CloM_B_body_geo": 3,
-                    "CloM_B_chenshan_geo":3,
-                    "CloM_B_kuzi_geo": 4,
-                    "CloM_B_waitao_geo": 5,
-                    "CloM_B_xie_geo": 3
-                }
-            ],
-            "useColorTag": [
-                "CloM_B_kuzi_geo",
-                "CloM_B_waitao_geo"
-            ],
+        //         }
+        //     ],
+        //     "lod_visible": [
+        //         {
+        //             "CloM_B_eyeLeft_geo1": 2,
+        //             "CloM_B_eyeRight_geo1": 2,
+        //             "eyelash": 2,
+        //             "hair": 3,
+        //             "head": 4,
+        //             "CloM_B_body_geo": 3,
+        //             "CloM_B_chenshan_geo":3,
+        //             "CloM_B_kuzi_geo": 4,
+        //             "CloM_B_waitao_geo": 5,
+        //             "CloM_B_xie_geo": 3
+        //         }
+        //     ],
+        //     "useColorTag": [
+        //         "CloM_B_kuzi_geo",
+        //         "CloM_B_waitao_geo"
+        //     ],
             
     
-            "walkAnimationList": [
-                21,12
-            ],
-            "sitAnimationList": [
+        //     "walkAnimationList": [
+        //         21,12
+        //     ],
+        //     "sitAnimationList": [
                 
-            ],
-            "standAnimationList": [
-                0,1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,22,23,24,25,26,27
-            ],
-            "pathAnima":  "assets/animation_man02.bin" ,
+        //     ],
+        //     "standAnimationList": [
+        //         0,1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,22,23,24,25,26,27
+        //     ],
+        //     "pathAnima":  "assets/animation_man02.bin" ,
 
-            "lod_distance":[ 5000, 15000, 30000, 60000, 100000 ],
-            "lod_geometry":    [ 20,  15,   1,    0,   0  ],
-            "lod_avatarCount": [ 200, 900, 3240, 8800, 12600]
-        }
+        //     "lod_distance":[ 5000, 15000, 30000, 60000, 100000 ],
+        //     "lod_geometry":    [ 20,  15,   1,    0,   0  ],
+        //     "lod_avatarCount": [ 200, 900, 3240, 8800, 12600]
+        // }
         switch(i){
             case 0:
                 return c0
@@ -260,7 +261,7 @@ export class AvatarManager {
             process([glb0.scene],0)
         })
         function process(scenes){
-            self.crowd.push(new Crowd({
+            self.crowd.push(new Instanced5Object({//new Crowd({//
                 camera: self.camera,
                 assets: {},
                 animPathPre: c.pathAnima,
