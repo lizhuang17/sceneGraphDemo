@@ -86,7 +86,7 @@ export class Viewer
             this.vc = this.update_matrix(new Vector3(-5.7,35.5,-79.5))
         }
 
-        window.playerControl = this.playerControl = new PlayerControl(this.defaultCamera, speed/5)
+        // window.playerControl = this.playerControl = new PlayerControl(this.defaultCamera, speed/5)
         window.orbitControl = this.orbitControl = new OrbitControls(this.defaultCamera, this.renderer.domElement)
         // this.orbitControl.autoRotate = false
         //this.orbitControl.autoRotateSpeed = -speed
@@ -112,7 +112,7 @@ export class Viewer
         // }
         var _self = this
         this.map = new smokemap(this.sceneEx)
-        // this.people = new AvatarManager(this.sceneEx, this.defaultCamera, this.map.maps)
+        this.people = new AvatarManager(this.sceneEx, this.defaultCamera, this.map.maps)
         this.globalPlane = new THREE.Plane( new THREE.Vector3( 0, 0, -1 ), 0.1 );
         this.globalPlane.constant =10000;//剖切的位置
         this.renderer.clippingPlanes.push(this.globalPlane);
