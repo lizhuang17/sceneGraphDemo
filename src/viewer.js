@@ -182,7 +182,12 @@ export class Viewer
         this.stats.update()
         if(this.map.map.length != 0 && !this.map.finish_load)
             this.map.init(this.renderer)
-
+        if(this.map.maps.finish_load && this.map.finish_load && this.people.seted){
+            this.people.setPos()
+            this.start_button.style.display="block"
+        }
+        if(this.ifpeople != 0 && this.ifpeople % 2 == 0)
+            this.people.update()
         if(this.ifsmoke != 0 && this.ifsmoke % 2 == 0)
             this.map.update()
         if(this.follow_p)
