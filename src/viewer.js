@@ -138,17 +138,13 @@ export class Viewer
             }else if(event.key === "c" || event.key === "C"){
                 console.log(_self.defaultCamera)
             }
-
         }
-
 
         this.onKeyUp = function (event){
             if(event.key==="m" || event.key==="M"){
                 _self.vis = !_self.vis
             }
         }
-
-
 
         this.onMouseDown = function(event){
             if(_self.ray){
@@ -157,8 +153,6 @@ export class Viewer
                 let ins = _self.ray.intersectObjects( [_self.groundMesh], false );
                 if(ins.length > 0 && _self.vis) _self.map.smoke_plane.fire_alarm(ins[0].point)
             }
-            
-
         }
 
         // this.onMouseUp = function(event){
@@ -174,12 +168,12 @@ export class Viewer
             ({ envMap }) => {
                 // alert(envMap)
                 window.scene=_self.scene
-                console.log(_self.scene)
-              _self.scene.background = envMap
-            //   _self.scene.backgroundIntensity=0.8
-            //   _self.scene.backgroundIntensity=0.4
-            //   self.unrealBloom.bloomPass.strength=0.55
-              _self.scene.environment = envMap
+                // console.log(_self.scene)
+                _self.scene.background = envMap
+                //   _self.scene.backgroundIntensity=0.8
+                //   _self.scene.backgroundIntensity=0.4
+                //   self.unrealBloom.bloomPass.strength=0.55
+                _self.scene.environment = envMap
             }
         )
     }

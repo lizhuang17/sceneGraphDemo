@@ -185,64 +185,64 @@ export class AvatarManager {
             "lod_geometry":    [ 20,  15,   1,    0,   0  ],
             "lod_avatarCount": [ 200, 900, 3240, 8800, 12600]
         }
-        // const c2={ 
-        //     "path": [
-        //         "assets/sim/man02/"
-        //     ],
-        //     "pathTexture":[
-        //         "./assets/textures_sim1/man02/"
-        //     ],
-        //     "meshType":[
-        //         {
-        //             "CloM_B_eyeLeft_geo1": "eye",
-        //             "CloM_B_eyeRight_geo1": "eye",
-        //             "eyelash": "eyelash",
-        //             "teeth": null,
-        //             "hair": "hair",
-        //             "head": "head",
-        //             "CloM_B_body_geo": "body",
-        //             "CloM_B_chenshan_geo":"coat",
-        //             "CloM_B_kuzi_geo": "coat",
-        //             "CloM_B_waitao_geo": "coat",
-        //             "CloM_B_xie_geo": "shoes"
+        const c2={ 
+            "path": [
+                "assets/sim/man02/"
+            ],
+            "pathTexture":[
+                "./assets/textures_sim1/man02/"
+            ],
+            "meshType":[
+                {
+                    "CloM_B_eyeLeft_geo1": "eye",
+                    "CloM_B_eyeRight_geo1": "eye",
+                    "eyelash": "eyelash",
+                    "teeth": null,
+                    "hair": "hair",
+                    "head": "head",
+                    "CloM_B_body_geo": "body",
+                    "CloM_B_chenshan_geo":"coat",
+                    "CloM_B_kuzi_geo": "coat",
+                    "CloM_B_waitao_geo": "coat",
+                    "CloM_B_xie_geo": "shoes"
     
-        //         }
-        //     ],
-        //     "lod_visible": [
-        //         {
-        //             "CloM_B_eyeLeft_geo1": 2,
-        //             "CloM_B_eyeRight_geo1": 2,
-        //             "eyelash": 2,
-        //             "hair": 3,
-        //             "head": 4,
-        //             "CloM_B_body_geo": 3,
-        //             "CloM_B_chenshan_geo":3,
-        //             "CloM_B_kuzi_geo": 4,
-        //             "CloM_B_waitao_geo": 5,
-        //             "CloM_B_xie_geo": 3
-        //         }
-        //     ],
-        //     "useColorTag": [
-        //         "CloM_B_kuzi_geo",
-        //         "CloM_B_waitao_geo"
-        //     ],
+                }
+            ],
+            "lod_visible": [
+                {
+                    "CloM_B_eyeLeft_geo1": 2,
+                    "CloM_B_eyeRight_geo1": 2,
+                    "eyelash": 2,
+                    "hair": 3,
+                    "head": 4,
+                    "CloM_B_body_geo": 3,
+                    "CloM_B_chenshan_geo":3,
+                    "CloM_B_kuzi_geo": 4,
+                    "CloM_B_waitao_geo": 5,
+                    "CloM_B_xie_geo": 3
+                }
+            ],
+            "useColorTag": [
+                "CloM_B_kuzi_geo",
+                "CloM_B_waitao_geo"
+            ],
             
     
-        //     "walkAnimationList": [
-        //         21,12
-        //     ],
-        //     "sitAnimationList": [
+            "walkAnimationList": [
+                21,12
+            ],
+            "sitAnimationList": [
                 
-        //     ],
-        //     "standAnimationList": [
-        //         0,1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,22,23,24,25,26,27
-        //     ],
-        //     "pathAnima":  "assets/animation_man02.bin" ,
+            ],
+            "standAnimationList": [
+                0,1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,22,23,24,25,26,27
+            ],
+            "pathAnima":  "assets/animation_man02.bin" ,
 
-        //     "lod_distance":[ 5000, 15000, 30000, 60000, 100000 ],
-        //     "lod_geometry":    [ 20,  15,   1,    0,   0  ],
-        //     "lod_avatarCount": [ 200, 900, 3240, 8800, 12600]
-        // }
+            "lod_distance":[ 5000, 15000, 30000, 60000, 100000 ],
+            "lod_geometry":    [ 20,  15,   1,    0,   0  ],
+            "lod_avatarCount": [ 200, 900, 3240, 8800, 12600]
+        }
         switch(i){
             case 0:
                 return c0
@@ -317,14 +317,17 @@ export class AvatarManager {
             let n = 0
             let de = 0
             if(i >= this.count*this.persent[0]){
-                if(i >= this.count*(1-this.persent[2])){
-                    n = 2
-                    de = this.count*(1-this.persent[2])
-                }
-                else{
-                    n = 1
-                    de = this.count*this.persent[0]
-                }
+                // if(i >= this.count*(1-this.persent[2])){
+                //     n = 2
+                //     de = this.count*(1-this.persent[2])
+                //     // continue
+                // }
+                // else{
+                //     n = 1
+                //     de = this.count*this.persent[0]
+                // }
+                n = 1
+                de = this.count*this.persent[0]
             }
             if(this.poslist[i]){
                 let old = this.poslist[i]
@@ -334,6 +337,7 @@ export class AvatarManager {
                 this.phs[i] = pos.splice(0,1)
                 this.poslist[i] = pos
                 this.dp[i] = [(pos[0]-old[0])*4, (pos[1]-old[1])*4, 0]
+                console.log(n,i-de,this.crowd[n])
                 this.crowd[n].move(i-de, [this.dp[i][0], this.dp[i][1], 0])
                 if(index <= 9)
                     this.crowd[n].setRotation(i-de, [Math.PI/2, index/4*Math.PI, 0])
@@ -341,8 +345,7 @@ export class AvatarManager {
                     this.poslist[i]=null
                     this.crowd[n].setRotation(i-de, [Math.PI/2,-Math.PI/2,0])
                 }
-            }
-            else{
+            }else{
                 if(this.ground[i] >= 311){
                     if((this.ground[i] <= 444 && this.ground[i] > 443) || (this.ground[i] <= 400 && this.ground[i] > 399 ) || (this.ground[i] <= 356 && this.ground[i] > 355)){
                         // console.log(1)
@@ -358,9 +361,10 @@ export class AvatarManager {
                 }
             }
         }
-        this.crowd[0].update()
-        this.crowd[1].update()
-        this.crowd[2].update()
+        for(let i of this.crowd)i.update()
+        // this.crowd[0].update()
+        // this.crowd[1].update()
+        // this.crowd[2].update()
     }
     follow(camera){
         let pos = this.poslist[this.ids[this.count-1]]
