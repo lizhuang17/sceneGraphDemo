@@ -7,15 +7,131 @@
         ],
 
         "pathTexture":[
-            "./assets/textures_sim1/woman01/",
-            "./assets/textures_sim1/woman02/",
-            "./assets/textures_sim1/woman03/"
+            {
+                "rootPath":"./assets/textures_sim1/woman01/",
+            
+                "CloW_A_body_geo": {
+                    "map": "CloW_A_body_BaseColor.jpg"
+                },
+                "CloW_A_kuzi_geo": {
+                    "map": "CloW_A_body_BaseColor.jpg"
+                },
+                "CloW_A_shangyi_geo": {
+                    "map": "CloW_A_body_BaseColor.jpg"
+                },
+                "CloW_A_waitao_geo1": {
+                    "map": "CloW_A_body_BaseColor.jpg"
+                },
+                "CloW_A_xiezi_geo": {
+                    "map": "CloW_A_body_BaseColor.jpg"
+                },
+            
+            
+                "CloW_E_eyeLeft_geo02": {
+                    "map": "CloW_A_EyeLash_kouqiang_BaseColor.png"
+                },
+                "CloW_E_eyeRight_geo01": {
+                    "map": "CloW_A_EyeLash_kouqiang_BaseColor.png"
+                },
+                "eyelash": {
+                    "map": "CloW_A_EyeLash_kouqiang_BaseColor.png"
+                },
+                "teeth": {
+                    "map": "CloW_A_EyeLash_kouqiang_BaseColor.png"
+                },
+            
+            
+                "hair": {
+                    "map": "CloW_A_hair_BaseColor.png"
+                },
+            
+                "head": {
+                    "map": "CloW_A_head_BaseColor.jpg"
+                }
+            
+                
+            },
+            {
+                "rootPath":"./assets/textures_sim1/woman02/",
+            
+                "body2": {
+                    "map": "CloW_B_body_BaseColor.jpg"
+                },
+            
+                "CloW_E_eyeLeft_geo02": {
+                    "map": "CloW_A_EyeLash_kouqiang_BaseColor.png"
+                },
+                "CloW_E_eyeRight_geo01": {
+                    "map": "CloW_A_EyeLash_kouqiang_BaseColor.png"
+                },
+                "eyelash": {
+                    "map": "CloW_A_EyeLash_kouqiang_BaseColor.png"
+                },
+            
+                "teeth": {
+                    "map": "CloW_A_EyeLash_kouqiang_BaseColor.png"
+                },
+            
+                "head": {
+                    "map": "CloW_A_head_BaseColor.jpg"
+                },
+                "qipao22": {
+                    "map": "CloW_B_body_BaseColor.jpg"
+                },
+                "waitao1": {
+                    "map": "CloW_B_body_BaseColor.jpg"
+                },
+                "xiezi": {
+                    "map": "CloW_B_body_BaseColor.jpg"
+                },
+                "hair": {
+                    "map": "CloW_B_hair_BaseColor.png"
+                }
+            
+                
+            },
+            {
+                "rootPath":"./assets/textures_sim1/woman03/",
+            
+                "CloW_C_body_geo1": {
+                    "map": "CloW_C_body_BaseColor.jpg"
+                },
+                "CloW_C_qunzi_geo3456": {
+                    "map": "CloW_C_body_BaseColor.jpg"
+                },
+                "CloW_C_shangyi_geo": {
+                    "map": "CloW_C_body_BaseColor.jpg"
+                },
+                "CloW_C_xie_geo": {
+                    "map": "CloW_C_body_BaseColor.jpg"
+                },
+                "head": {
+                    "map": "CloW_A_head_BaseColor.jpg"
+                },
+                "eyelash": {
+                    "map": "CloW_A_EyeLash_kouqiang_BaseColor.png"
+                },
+                "CloW_E_eyeLeft_geo02": {
+                    "map": "CloW_A_EyeLash_kouqiang_BaseColor.png"
+                },
+                "CloW_E_eyeRight_geo01": {
+                    "map": "CloW_A_EyeLash_kouqiang_BaseColor.png"
+                },
+                "teeth": {
+                    "map": "CloW_A_EyeLash_kouqiang_BaseColor.png"
+                },
+                "hair": {
+                    "map": "CloW_B_hair_BaseColor.png"
+                }
+            
+                
+            }
         ],
         "meshType":[
             {
 
-                "CloW_A_body_geo": "coat",
-                "CloW_A_kuzi_geo": "coat",
+                "CloW_A_body_geo": "body",
+                "CloW_A_kuzi_geo": "trousers",
                 "CloW_A_shangyi_geo": "coat",
                 "CloW_A_waitao_geo1": "coat",
 
@@ -33,16 +149,16 @@
                 "eyelash":null,
                 "hair":"hair",
 
-                "body2":"coat",
-                "qipao22":"coat",
+                "body2":"body",
+                "qipao22":"trousers",
                 "waitao1": "coat",
                 "xiezi":null,
                 "head":null,
                 "teeth":null
             },
             {
-                "CloW_C_body_geo1":"coat",
-                "CloW_C_qunzi_geo3456":"coat",
+                "CloW_C_body_geo1":"body",
+                "CloW_C_qunzi_geo3456":"trousers",
                 "CloW_C_shangyi_geo":"coat",
                 "CloW_C_xie_geo":null,
                 "head":null,
@@ -52,6 +168,13 @@
                 "teeth":null,
                 "hair":"hair"
             }
+        ],
+        "constraint":[
+            {"body":0,"coat":0,"trousers":0},
+            {"body":1,"coat":1,"trousers":1},
+            {"body":2,"coat":2,"trousers":2},
+            {"body":2,"coat":0,"trousers":2},
+            {"body":2,"coat":0,"trousers":1}
         ],
         "lod_visible": [
             {
@@ -86,6 +209,16 @@
             }
         ],
         "useColorTag": [
+            "CloW_A_kuzi_geo",
+            "CloW_A_waitao_geo1",
+
+            "qipao22",
+            "waitao1",
+
+            "CloW_C_qunzi_geo3456",
+            "CloW_C_shangyi_geo",
+
+            "CloW_A_xiezi_geo"
         ],
         
 
@@ -93,10 +226,10 @@
             5,8
         ],
         "sitAnimationList": [
-            
+            6,7
         ],
         "standAnimationList": [
-            0,1,2,3,4,6,7,9,10,11,12
+            0,1,2,3,4,9,10,11,12
         ],
         "pathAnima":  "assets/animation_woman0.bin" ,
 

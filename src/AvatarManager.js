@@ -1,6 +1,7 @@
 import {GLTFLoader} from '../lib/three/examples/jsm/loaders/GLTFLoader'
-// import { Crowd } from '../lib/crowd/Crowd.js'
 import { Instanced5Object } from '../lib/crowd/Instanced5Object'//let Crowd=Pack// 
+import config_woman   from '../config/sceneConifg_woman0.json'
+import config_man from '../config/sceneConifg_man01.json'
 import * as THREE from "three"
 export class AvatarManager {
     constructor(scene, camera, map, count=200) {
@@ -53,212 +54,128 @@ export class AvatarManager {
             if(count_i == 2) clearInterval(interv)
         },500)
     }
-    getConfig(i){
-        const c0={ 
-            "path": [
-                "assets/sim/woman01/"
-            ],
-    
-            "pathTexture":[
-                "./assets/textures_sim1/woman01/"
-            ],
-            "meshType":[
-                {
-    
-                    "CloW_A_body_geo": "coat",
-                    "CloW_A_kuzi_geo": "trousers",
-                    "CloW_A_shangyi_geo": "coat",
-                    "CloW_A_waitao_geo1": "coat",
-                    "CloW_A_xiezi_geo": "xiezi",
-                    "CloW_E_eyeLeft_geo02": "eye",
-                    "CloW_E_eyeRight_geo01": "eye",
-                    "eyelash": "eyelash",
-                    "hair": "hair",
-                    "head": "head",
-                    "teeth": null
-                }
-            ],
-            "lod_visible": [
-                {
-                    "CloW_A_kuzi_geo": 5,
-                    "CloW_A_shangyi_geo": 4,
-                    "head":4,
-    
-                    "CloW_A_body_geo": 3,
-                    
-                    
-                    "CloW_A_waitao_geo1": 3,
-    
-                    "CloW_A_xiezi_geo": 3,
-                    "CloW_E_eyeLeft_geo02": 2,
-                    "CloW_E_eyeRight_geo01": 2,
-                    "eyelash": 2,
-                    "hair": 3
-                    
-                }
-            ],
-            "useColorTag": [
-                "CloW_A_kuzi_geo",
-                "CloW_A_shangyi_geo",
-                "CloW_A_waitao_geo1",
-                "CloW_A_xiezi_geo"
-            ],
+    getConfig(flag){
+        let config=flag==0?config_woman:config_man
+        for(let i=0;i<config.length;i++){
+            let c1=config[i]
+            c1.scale=2
             
-    
-            "walkAnimationList": [
-                5,8
-            ],
-            "sitAnimationList": [
-                
-            ],
-            "standAnimationList": [
-                0,1,2,3,4,6,7,9,10,11,12
-            ],
-            "pathAnima":  "assets/animation_woman0.bin" ,
+            // c1.lod_distance=[ 5000, 15000, 30000, 60000, 100000 ]
+            // c1.lod_geometry=[ 20,  15,   1,    0,   0  ]
+            // c1.lod_avatarCount=[ 200, 900, 3240, 8800, 12600]
 
-            "lod_distance":[ 5000, 15000, 30000, 60000, 100000 ],
-            "lod_geometry":    [ 20,  15,   1,    0,   0  ],
-            "lod_avatarCount": [ 200, 900, 3240, 8800, 12600]
-        }
-        const c1={ 
-            "path": [
-                "assets/sim/man01/"
-            ],
-    
-            "pathTexture":[
-                "./assets/textures_sim1/man01/"
-            ],
-            "meshType":[
-                {
-                    "CloM_A_hair_geo":"hair",
-                    "CloM_A_body_geo":"body",
-                    "CloM_A_chengyi_geo":"coat",
-                    "CloM_A_lingdai_geo":"coat",
-                    "CloM_A_xiezi_geo":"shoes",
-                    "CloM_A_xiukou_geo":"coat",
-                    "CloM_A_xizhuang_geo":"coat",
-                    "CloM_A_xizhuangku_geo":"coat",
-                    "CloM_B_eyeLeft_geo2":"eye",
-                    "CloM_B_eyeRight_geo2":"eye",
-                    "head":"head",
-                    "eyelash":"eyelash",
-                    "teeth":null
-    
-                }
-            ],
-            "lod_visible": [
-                {
-                    
-                    "CloM_A_xizhuang_geo":5,
-                    "CloM_A_xizhuangku_geo":4,
-                    "head":4,
-                    
-                    "CloM_A_hair_geo":3,
-                    "CloM_A_body_geo":3,
-                    "CloM_A_chengyi_geo":3,
-                    "CloM_A_lingdai_geo":3,
-                    "CloM_A_xiezi_geo":3,
-                    "CloM_A_xiukou_geo":3,
-                    
-                    "CloM_B_eyeLeft_geo2":2,
-                    "CloM_B_eyeRight_geo2":2,
-                    "eyelash":2
-                }
-            ],
-            "useColorTag": [
-                "CloW_A_xifu_geo",
-                "CloW_A_kuzi_geo",
-                "CloW_E_shangyi_geo",
-                "CloW_E_kuzi_geo"
-            ],
-            "walkAnimationList": [
-                5,8
-            ],
-            "sitAnimationList": [  
-            ],
-            "standAnimationList": [
-                0,1,2,3,4,6,7,9,10
-            ],
-            "pathAnima":  "assets/animation_man0.bin" ,
-
-            "lod_distance":[ 5000, 15000, 30000, 60000, 100000 ],
-            "lod_geometry":    [ 20,  15,   1,    0,   0  ],
-            "lod_avatarCount": [ 200, 900, 3240, 8800, 12600]
-        }
-        const c2={ 
-            "path": [
-                "assets/sim/man02/"
-            ],
-            "pathTexture":[
-                "./assets/textures_sim1/man02/"
-            ],
-            "meshType":[
-                {
-                    "CloM_B_eyeLeft_geo1": "eye",
-                    "CloM_B_eyeRight_geo1": "eye",
-                    "eyelash": "eyelash",
-                    "teeth": null,
-                    "hair": "hair",
-                    "head": "head",
-                    "CloM_B_body_geo": "body",
-                    "CloM_B_chenshan_geo":"coat",
-                    "CloM_B_kuzi_geo": "coat",
-                    "CloM_B_waitao_geo": "coat",
-                    "CloM_B_xie_geo": "shoes"
-    
-                }
-            ],
-            "lod_visible": [
-                {
-                    "CloM_B_eyeLeft_geo1": 2,
-                    "CloM_B_eyeRight_geo1": 2,
-                    "eyelash": 2,
-                    "hair": 3,
-                    "head": 4,
-                    "CloM_B_body_geo": 3,
-                    "CloM_B_chenshan_geo":3,
-                    "CloM_B_kuzi_geo": 4,
-                    "CloM_B_waitao_geo": 5,
-                    "CloM_B_xie_geo": 3
-                }
-            ],
-            "useColorTag": [
-                "CloM_B_kuzi_geo",
-                "CloM_B_waitao_geo"
-            ],
+            c1.lod_distance=[ 10, 20, 40, 80, 160, 320 ]
+            c1.lod_geometry=[ 20, 15,  7,  2,   1,   0 ]
+            c1.lod_avatarCount=[ 500, 500, 500, 500, 500, 500]
             
-    
-            "walkAnimationList": [
-                21,12
-            ],
-            "sitAnimationList": [
-                
-            ],
-            "standAnimationList": [
-                0,1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,22,23,24,25,26,27
-            ],
-            "pathAnima":  "assets/animation_man02.bin" ,
+            const lodConut=3//10//21
+            const countAll=250//2500*2*10
+            const distanceAll=200//*0.8*0.25//300
+            c1.lod_distance=[ ]
+            c1.lod_geometry=[ ]
+            c1.lod_avatarCount=[ ]
+            let r_pre=0
+            for(let j=0;j<lodConut;j++){
+                const r=Math.pow((j+1)/lodConut,1.2)*distanceAll
+                c1.lod_distance.push(r)
+                if(j==0)c1.lod_geometry.push(15)
+                // else if(j==1)c1.lod_geometry.push(0)
+                else c1.lod_geometry.push(7*(lodConut-j-1)+1)
 
-            "lod_distance":[ 5000, 15000, 30000, 60000, 100000 ],
-            "lod_geometry":    [ 20,  15,   1,    0,   0  ],
-            "lod_avatarCount": [ 200, 900, 3240, 8800, 12600]
+                const n=countAll*[Math.pow(r,2)-Math.pow(r_pre,2)]/Math.pow(distanceAll,2)
+                r_pre=r
+                c1.lod_avatarCount.push(Math.ceil(n))
+            }
+            for(let i=0;i<c1.lod_distance.length;i++){
+                c1.lod_distance[i]*=c1.scale
+            }
+            // console.log(c1)
+            for(let j=0;j<c1.lod_visible.length;j++){
+                for(let tag in c1.lod_visible[j]){
+                    c1.lod_visible[j][tag]=lodConut
+                }
+            }
+            // c1.lod_distance[c1.lod_distance.length-2]*=2
+            c1.lod_distance[c1.lod_distance.length-1]*=4//*2
         }
-        switch(i){
-            case 0:
-                return c0
-            case 1:
-                return c1
-            case 2:
-                return c2
-            default:
-                return c0
-        }
+        return config[0]
     }
-    init(i) {
+    async loadMaterial_json(path,pathTexture){
+        const self=this
+        function json2obj(j,o){
+            for(let t in j.base){
+                o[t]=j.base[t]
+            }
+            return o
+        }
+        return new Promise((resolve, reject) => {
+            window.loadJson(path,data=>{
+                console.log(data)
+                const group=new THREE.Group()
+                for(let t in data){
+                    const v=data[t]
+
+                    const mesh=new THREE.Mesh()
+                    mesh.geometry=new THREE.BufferGeometry()
+                    for(let tag of ["position","skinIndex","skinWeight","uv","normal"])
+                        mesh.geometry.attributes[tag]=new THREE.BufferAttribute(new Float32Array([]),3)         
+                    mesh.name=t
+                    mesh.skeleton={bones:{
+                        length:v.lenb
+                    }}
+                    mesh.material=new THREE[v.type]()
+    
+                    json2obj(v,mesh.material)
+                    for(let i in v.text){
+                        // console.log(pathTexture["rootPath"]+pathTexture[mesh.name][i])
+                        const textureUrl=pathTexture["rootPath"]+pathTexture[mesh.name][i]
+                        mesh.material[i]=//i为map
+                            textureUrl?self.textureLoader.load ( textureUrl ):new THREE.Texture()    
+                        //new THREE.TextureLoader().load ( "favicon.f070609c.ico")//new THREE.Texture()//{}
+                        // console.log(mesh.name,i,)
+                        json2obj(v.text[i],mesh.material[i])
+                    }
+                    // console.log(mesh.material,v.text)
+                    group.add(mesh)
+                }
+                // self.adjustParam(group)
+                setTimeout(()=>{
+                   resolve(group)//cb(group)//return group 
+                },1000)
+                
+            })
+        })
+    }
+    async loadMaterial_glb(path){//c.path+"sim.glb"
+        return new Promise((resolve, reject) => {
+            new GLTFLoader().load(path, (glb0) => {
+                // alert(glb0)
+                // glb0.scene.traverse(mesh=>{
+                //     if(mesh instanceof THREE.Mesh){
+                //         // mesh.material
+                //         mesh.castShadow = false
+                //         mesh.receiveShadow = false//true
+                //     }
+                // })
+                resolve(glb0.scene)// process([glb0.scene],0)
+            })
+        })
+    }
+    async init(i) {
         const c=this.getConfig(i)
         const self = this
-        new GLTFLoader().load(c.path+"sim.glb", async (glb0) => {
-            process([glb0.scene],0)
+        // new GLTFLoader().load(c.path+"sim.glb", async (glb0) => {
+        //     process([glb0.scene],0)
+        // })
+        self.materialLoaderType="glb_material"
+        Promise.all(
+            Array.from(Array(c.path.length)).map((_, i) => 
+                self.materialLoaderType=="json_material"?
+                self.loadMaterial_json(c.path[i]+"material.json",c.pathTexture[i]):
+                self.loadMaterial_glb(c.path[i]+"sim.glb")
+            )
+        ).then(res => {
+            process(res) // 10
         })
         function process(scenes){
             self.crowd.push(new Instanced5Object({//new Crowd({//
@@ -271,7 +188,10 @@ export class AvatarManager {
                 lod_geometry:  c.lod_geometry,
                 lod_visible: c.lod_visible,
                 meshType: c.meshType,
-                pathLodGeo: [c.path+"LOD/"],
+                pathLodGeo: 
+                    Array.from(Array(c.path.length)).map((_, i) => 
+                        c.path[i]+"LOD/"
+                    ),//[c.path+"LOD/"],
                 pathTexture: c.pathTexture,
                 pathTextureConfig: [c.path+"texture_names.json"],
                 useColorTag:  c.useColorTag
@@ -284,7 +204,7 @@ export class AvatarManager {
                 else
                     var p = self.poslist[i00]
                 self.crowd[i].setPosition(i00,[p[0]*4+self.map_edges[0][1]+Math.random()*4,p[1]*4+self.map_edges[0][3]+Math.random()*4,p[2]])
-                self.crowd[i].setRotation(i00,[Math.PI/2,Math.PI,0])
+                self.crowd[i].setRotation(i00,[Math.PI/2,Math.PI+Math.random()*99,0])
                 if(i==2)
                     self.crowd[i].setAnimation(
                         i00,
@@ -307,7 +227,124 @@ export class AvatarManager {
                 self.crowd[i].setColor(i00,[j*Math.random()*2,j*Math.random(),j*Math.random()],"CloW_A_kuzi_geo")
                 self.crowd[i].setColor(i00,[j*Math.random()*2,j*Math.random(),j*Math.random()],"CloW_A_waitao_geo1")
             }
+            ////////////
+            const crowd=self.crowd[i]
+            function r(arr){
+                const randomIndex = Math.floor(Math.random() * arr.length)
+                return arr[randomIndex]
+            }
+            
+            for (var i00 = 0; i00 < crowd.count; i00++) {
+                // const p=self.poslist[i00]
+                // crowd.setPosition(i00,[
+                //     p[0],//+(2*Math.random()-1)*5,
+                //     p[1],
+                //     p[2]//+(2*Math.random()-1)*5
+                // ])
+                if(true){//if(Math.random()>0.3){//
+                    crowd.setAnimation(
+                        i00,
+                        r(c.standAnimationList),
+                        Math.random()*10000
+                    )
+                }else{
+                    crowd.setAnimation(
+                        i00,
+                        r(c.walkAnimationList),
+                        Math.random()*10000
+                    )
+                    crowd.setMoveMaxLength(
+                        i00,
+                        (0.5+Math.random())*10
+                    )
+                    // crowd.setRotation(
+                    //     i00,[0,0,0]
+                    // )
+                }
+                crowd.setSpeed(i00, 1+8*Math.random())
+                crowd.setBodyScale(i00,[
+                    (Math.random()-0.5)/1.5,
+                    (Math.random()-0.5)/1.5,
+                    (Math.random()-0.5)/1.5,
+                    (Math.random()-0.5)/1.5,
+                ])
+                // crowd.setScale(i00, [
+                //     -900,
+                //     -900*(1-0.2+0.2*Math.random()),
+                //     900])
+                // crowd.setScale(i00, [
+                //     c.scale,
+                //     c.scale*(1-0.2+0.2*Math.random()),
+                //     c.scale])
+                // crowd.setObesity(i00, 0.8+0.4*Math.random())
+                let flag=true
+                if(c.constraint){
+                    const i000 = Math.floor(Math.random() * c.constraint.length)
+                    const constraint0=c.constraint[i000]
+                    for(let partName in constraint0)
+                        crowd.setPartType(i00,partName,constraint0[partName])
+                    if(i000>=3)flag=false
+                }
+                if(flag){
+                    let j=10
+                    crowd.setColor(i00,[j*Math.random()*2,j*Math.random(),j*Math.random()],"CloW_A_kuzi_geo")
+                    // crowd.setColor(i00,[j*Math.random()*2,j*Math.random(),j*Math.random()],"CloW_A_shangyi_geo")
+                    crowd.setColor(i00,[j*Math.random()*2,j*Math.random(),j*Math.random()],"CloW_A_waitao_geo1")
+                    crowd.setColor(i00,[j*Math.random()*2,j*Math.random(),j*Math.random()],"CloW_A_xiezi_geo")
+
+                    j=-0.3
+                    crowd.setColor(i00,[j*Math.random(),j*Math.random(),j*Math.random()],"qipao22")
+                    crowd.setColor(i00,[j*Math.random(),j*Math.random(),j*Math.random()],"waitao1")
+
+                    j=0.1
+                    crowd.setColor(i00,[j*Math.random(),j*Math.random(),j*Math.random()],"CloW_C_qunzi_geo3456")
+                    crowd.setColor(i00,[j*Math.random(),j*Math.random(),j*Math.random()],"CloW_C_shangyi_geo")
+
+                }
+                
+            }
+            for(let i=0;i<scenes.length;i++){
+                scenes[i].traverse(node=>{
+                    if(node instanceof THREE.SkinnedMesh){
+                        node.material=node.material.clone()
+                        let material=node.material
+                        let name=node.name
+                        let meshType=c['meshType'][i][name]
+                        if(meshType=='body'||meshType=='head'){
+                            material.color.r-=0.6
+                            material.color.g-=0.6
+                            material.color.b-=0.6
+                            // material.roughness=0//-=0.6
+                            // material.metalness=0//+=0.2
+                            // material.envMapIntensity=0
+                            // material.emissiveIntensity=0
+                            // material.lightMapIntensity=0
+                        }else if(meshType=='hair'){
+                            material.side=2
+                            // material.color.r=1000;
+                            material.metalness=0.5
+                            material.roughness=0.5
+                        }else if(meshType=="eye"){
+                            material.metalness=1
+                            material.roughness=0.5
+                        }else if(meshType=="trousers"||meshType=="coat"){
+                            material.metalness=1
+                            // material.roughness-=0.5
+                            material.color.r=material.color.g=material.color.b=1
+
+                            material.envMapIntensity=1
+                            material.emissiveIntensity=1
+                            material.lightMapIntensity=1
+                        }else if(meshType=="shoes"){
+                            material.metalness=1
+                            material.roughness=0.5
+                        }
+                    }
+                })
+            }
+            ////////////
             self.crowd[i].init(scenes)
+            
             self.scene.add(self.crowd[i])
         }
     }
@@ -337,7 +374,7 @@ export class AvatarManager {
                 this.phs[i] = pos.splice(0,1)
                 this.poslist[i] = pos
                 this.dp[i] = [(pos[0]-old[0])*4, (pos[1]-old[1])*4, 0]
-                console.log(n,i-de,this.crowd[n])
+                // console.log(n,i-de,this.crowd[n])
                 this.crowd[n].move(i-de, [this.dp[i][0], this.dp[i][1], 0])
                 if(index <= 9)
                     this.crowd[n].setRotation(i-de, [Math.PI/2, index/4*Math.PI, 0])
