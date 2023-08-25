@@ -104,21 +104,6 @@ export class Viewer
         window.addEventListener('resize', this.resize.bind(this), false)
 
         this.setupScene()
-
-        // {   
-        //     this.plane=false
-        //     this.fire_init=false
-        //     this.is_smoke=false
-        //     this.iswater=false
-        //     this.nssmoke = 0
-        //     // this.fire = new Fire([0,0,0], this.sceneEx)
-        //     //this.smoke = new Smoke(this.sceneEx, this.renderer)
-        //     this.ispeople = 0
-        //     this.ispeople1 = 0
-        //     this.waterMesh = null
-        //     this.is_edit = -1
-        //     this.mr = null
-        //     this.mb = null
             this.groundMesh = new THREE.Mesh(new THREE.PlaneGeometry(10000,10000), new THREE.MeshBasicMaterial({visible:false,side:THREE.DoubleSide, color:0xffffff}))
             this.groundMesh.position.set(0,0,550)
             this.sceneEx.add(this.groundMesh)
@@ -161,159 +146,7 @@ export class Viewer
             }else if(event.key === "c" || event.key === "C"){
                 console.log(_self.defaultCamera)
             }
-            // else if(event.key === "z"){
-            //     var geometry = new THREE.PlaneGeometry(100, 100);
-            //     var material = new THREE.ShaderMaterial({
-            //         transparent: true,
-            //         vertexShader: document.getElementById('vertexShader').textContent,
-            //         fragmentShader: document.getElementById('fragmentShader').textContent,
-            //         side: THREE.DoubleSide,
-            //         uniforms: {
-            //             maptexture: { value: new THREE.TextureLoader().load('textures/try.png') }
-            //         }
-            //     });
-            
-            //     var mesh = new THREE.Mesh(geometry, material);
-            //     _self.sceneEx.add(mesh);
-            // }else if(event.key === "v") {
-            //     let tex = new THREE.TextureLoader().load('textures/waterdudv.jpg')
-            //     let vertexShader = /* glsl */`
-            //         in vec3 position;
-            //         in vec3 resolution;
-            //         out vec3 mposition;
 
-            //         uniform mat4 modelMatrix;
-            //         uniform mat4 modelViewMatrix;
-            //         uniform mat4 projectionMatrix;
-
-            //         uniform vec3 res;
-                    
-            //         void main() {
-            //             mposition = position / res + 0.5;
-            //             vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-            //             gl_Position = projectionMatrix * mvPosition;
-            //         }
-                
-			// 	`;
-
-			// 	let fragmentShader = /* glsl */`
-			// 		precision highp float;
-
-			// 		uniform mat4 modelViewMatrix;
-			// 		uniform mat4 projectionMatrix;
-
-			// 		out vec4 color;
-            //         in vec3 mposition;
-
-			// 		uniform sampler2D map;
-
-			// 		void main(){
-            //             vec2 vUV=vec2(mposition.x, mposition.y);
-            //             vec4 tex = texture(map, vUV);
-            //             color = tex;
-			// 		}
-			// 	`;
-            //     let resolution = new THREE.Vector3(100, 100, 100)
-            //     let geo = new THREE.BoxGeometry( 100, 100, 100 )
-            //     let mat = new THREE.RawShaderMaterial( {
-			// 		glslVersion: THREE.GLSL3,
-			// 		uniforms: {
-			// 			map: { value: tex },
-            //             res: { value: resolution }
-			// 		},
-			// 		vertexShader,
-			// 		fragmentShader,
-			// 		transparent: true
-			// 	} );
-            //     let mesh = new THREE.Mesh(geo, mat)
-            //     let me = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({color: 0x000000}))
-                
-            //     _self.sceneEx.add(mesh)
-            // }else if(event.key==="F"||event.key==="f"){
-            //     const vertexShader = `
-            //         uniform float time;
-            //         uniform float opacityData[10000]; // 假设一维数组大小为100x100
-            //         varying vec2 vUv;
-            //         varying float vOpacity;
-            //         attribute float vertexIndex;
-
-            //         void main() {
-            //             vUv = uv;
-
-            //             int index = int(vertexIndex);
-            //             int x = index % 100; // 计算点在数组中的x坐标
-            //             int y = index / 100; // 计算点在数组中的y坐标
-
-            //             vec3 newPosition = position;
-            //             newPosition.z += sin(position.x + time) * sin(position.y + time);
-            //             gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
-
-            //             vOpacity = opacityData[index];
-            //         }
-            //     `;
-
-            //     const fragmentShader = `
-            //         uniform sampler2D maptexture;
-            //         varying vec2 vUv;
-            //         varying float vOpacity;
-
-            //         void main() {
-            //             vec4 texColor = texture2D(maptexture, vUv);
-            //             vec4 finalColor = texColor * vec4(1.0, 1.0, 1.0, vOpacity);
-            //             gl_FragColor = finalColor;
-            //         }
-            //     `;
-
-            //     const smokemap = new THREE.TextureLoader().load('textures/pur.png');
-            //     const geom = new THREE.PlaneGeometry(100, 100, 99, 99);
-
-            //     let opdata = new Float32Array(10000);
-            //     for (let i = 0; i < 10000; i++) {
-            //         opdata[i] = Math.random() >= 0.5 ? 1.0 : 0.0;
-            //     }
-
-            //     geom.setAttribute('vertexIndex', new THREE.BufferAttribute(new Float32Array(opdata), 1));
-
-            //     _self.trym = new THREE.ShaderMaterial({
-            //         vertexShader: vertexShader,
-            //         fragmentShader: fragmentShader,
-            //         uniforms: {
-            //             opacityData: { value: opdata },
-            //             time: { value: 0.0 },
-            //             maptexture: { value: smokemap }
-            //         },
-            //     });
-
-            //     _self.trymesh = new THREE.Mesh(geom, _self.trym);
-            //     _self.sceneEx.add(_self.trymesh);
-            // }else if(event.key==="O"||event.key==="o"){
-            //     _self.is_edit+=1
-            //     // window.model.op=0.1
-            //     _self.people.draw()
-            //     if(_self.is_edit>=_self.people.floors){
-            //         _self.is_edit=-1
-            //         // window.model.op=1
-            //     }
-            //     _self.people.enter_edit(_self.is_edit)
-            // }else if(event.keyCode == 16){//shift
-            //     _self.pressed = true
-            // }else if(event.key==="U"||event.key==="u"){
-            //     _self.groundMesh.position.z += 1
-            //     console.log(_self.groundMesh.position.z)
-            // }else if(event.key==="J"||event.key==="j"){
-            //     _self.groundMesh.position.z -= 1
-            //     console.log(_self.groundMesh.position.z)
-            // }else if(event.key==="H"||event.key==="h"){
-            //     if(_self.plane){
-            //         if(_self.groundMesh.visible)
-            //             _self.groundMesh.visible = false
-            //         else
-            //             _self.groundMesh.visible=true
-            //     }else{
-            //         _self.sceneEx.add(_self.groundMesh)
-            //         _self.plane=true
-            //     }
-            // }
         }
 
 
@@ -323,61 +156,14 @@ export class Viewer
             }
         }
 
-        // this.onMouseMove = function(event){
-        //     if(_self.mr){
-        //         let point = new THREE.Vector2(( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1)
-        //         _self.ray.setFromCamera( point, _self.defaultCamera );
-        //         let intersects = _self.ray.intersectObjects( [_self.people.planes[_self.people.editing]], false );
-        //         if ( intersects.length > 0) {
-        //             var intersect = intersects[ 0 ];
-        //             _self.mr.position.copy(intersect.point)
-        //             _self.people.moveTogether(_self.mr, null)//todos
-        //         }
-        //     }else if(_self.mb){
-        //         let point = new THREE.Vector2(( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1)
-        //         _self.ray.setFromCamera( point, _self.defaultCamera );
-        //         let intersects = _self.ray.intersectObjects( [_self.people.planes[_self.people.editing]], false );
-        //         if ( intersects.length > 0) {
-        //             var intersect = intersects[ 0 ];
-        //             _self.mb.position.copy(intersect.point)
-        //             _self.people.moveTogether(null, _self.mb)
-        //         }
-        //     }
-        // }
+
 
         this.onMouseDown = function(event){
             let point = new THREE.Vector2(( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1)
             _self.ray.setFromCamera( point, _self.defaultCamera );
             let ins = _self.ray.intersectObjects( [_self.groundMesh], false );
             if(ins.length > 0 && _self.vis) _self.map.smoke_plane.fire_alarm(ins[0].point)
-            // if(_self.pressed){
-            //     let intersects = _self.ray.intersectObjects( [_self.people.planes[_self.people.editing]], false );
-            //     if ( intersects.length > 0 ) {
-            //         let intersect = intersects[ 0 ];
-            //         let pos = [intersect.point.x, intersect.point.y, intersect.point.z]
-            //         _self.people.add_editer(pos, [100,100])
-            //     }
-            // }else{
-            //     if(_self.mr){
-            //         _self.mr = null
-            //     }else if(_self.mb){
-            //         _self.mb = null
-            //     }else{
-            //         if(_self.people.balls[_self.people.editing].length != 0){
-            //             let intersects = _self.ray.intersectObjects( _self.people.balls[_self.people.editing], false );
-            //             if ( intersects.length > 0 ) {
-            //                 let intersect = intersects[ 0 ]
-            //                 _self.mb=intersect.object
-            //             }else{
-            //                 intersects = _self.ray.intersectObjects( _self.people.areas[_self.people.editing], false );
-            //                 if ( intersects.length > 0 ) {
-            //                     let intersect = intersects[ 0 ]
-            //                     _self.mr=intersect.object
-            //                 }
-            //             }
-            //         }
-            //     }
-            // }
+
         }
 
         // this.onMouseUp = function(event){
@@ -396,12 +182,7 @@ export class Viewer
         this.stats.update()
         if(this.map.map.length != 0 && !this.map.finish_load)
             this.map.init(this.renderer)
-        // if(this.map.maps.finish_load && this.map.finish_load && this.people.seted){
-        //     this.people.setPos()
-        //     this.start_button.style.display="block"
-        // }
-        // if(this.ifpeople != 0 && this.ifpeople % 2 == 0)
-        //     this.people.update()
+
         if(this.ifsmoke != 0 && this.ifsmoke % 2 == 0)
             this.map.update()
         if(this.follow_p)
@@ -468,39 +249,6 @@ export class Viewer
     }
 
     setCamera(){
-        // var self = this
-        // setInterval(function(){
-        // var s = "new Vector3("
-        //     s += self.defaultCamera.position.x.toFixed(1).toString()
-        //     s += ","
-        //     s += self.defaultCamera.position.y.toFixed(1).toString()
-        //     s += ","
-        //     s += self.defaultCamera.position.z.toFixed(1).toString()
-        //     s += "),"
-        // }, 2000)
-
-        // this.defaultCamera.position.set(0,-1200,0)
-        // this.defaultCamera.lookAt(0,0,0)
-
-        // if(window.projectName==="HaiNing")
-        //     var pos = [391.9,1094.1,1126.1]
-        // else if(window.projectName==="KaiLiNan")
-        //     var pos = [-440.7,40.0,103.4]
-        // else if(window.projectName==="LanQiao")
-        //     var pos = [181.1,512.9,913.8]
-        // else if(window.projectName==="QinLaiLi")
-        //     var pos = [-182.4,251.1,-306.4]
-        // else if(window.projectName==="RenFuYiYuan")
-        //     var pos = [320.0,5169.8,-7571.8]
-        // else if(window.projectName==="XinYu")
-        //     var pos = [224.4,138.6,-221.4]
-        // else if(window.projectName==="YunXi")
-        //     var pos = [103.2,389.4,287.9]
-        
-        // var vp = this.update_matrix(pos)
-
-        // this.defaultCamera.position.copy(vp)
-        // this.defaultCamera.lookAt(this.vc)
         window.orbitControl.target.set(478, 232, 520)
         this.defaultCamera.position.copy(new THREE.Vector3(46, 428, 520))
         this.defaultCamera.rotation.set(-1.4224373930666911,-0.6568369064643255,-3.050584019382628)
