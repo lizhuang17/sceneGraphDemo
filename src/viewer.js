@@ -8,7 +8,7 @@ Vector3=THREE.Vector3,
 WebGLRenderer=THREE.WebGLRenderer,
 // PlaneGeometry=THREE.PlaneGeometry,
 // Mesh=THREE.Mesh,
-MeshBasicMaterial=THREE.MeshBasicMaterial,
+// MeshBasicMaterial=THREE.MeshBasicMaterial,
 Matrix4=THREE.Matrix4
 
 import {GUI} from 'dat.gui'
@@ -118,8 +118,15 @@ export class Viewer
         //ground 311
         var tex_g = new THREE.TextureLoader().load( 'ground.jpeg' )// 地面贴图
         tex_g.wrapS=tex_g.wrapT=THREE.RepeatWrapping
-        tex_g.repeat.set(1000,1000)
-        this.ground_t = new THREE.Mesh(new THREE.PlaneGeometry(5000,5000), new MeshBasicMaterial({map: tex_g}))
+        tex_g.repeat.set(50,50)
+        const material=new THREE.MeshStandardMaterial({map: tex_g})
+        material.side=2
+        material.metalness=1
+        material.roughness=0.5
+        material.opacity=0.7
+        material.transparent=true
+        
+        this.ground_t = new THREE.Mesh(new THREE.PlaneGeometry(5000,5000), material)
         this.ground_t.position.set(0,0,311)
         this.sceneEx.add(this.ground_t)
         this.onKeyDown = function (event){
