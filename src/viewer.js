@@ -6,8 +6,8 @@ Scene=THREE.Scene,
 sRGBEncoding=THREE.sRGBEncoding,
 Vector3=THREE.Vector3,
 WebGLRenderer=THREE.WebGLRenderer,
-PlaneGeometry=THREE.PlaneGeometry,
-Mesh=THREE.Mesh,
+// PlaneGeometry=THREE.PlaneGeometry,
+// Mesh=THREE.Mesh,
 MeshBasicMaterial=THREE.MeshBasicMaterial,
 Matrix4=THREE.Matrix4
 
@@ -16,7 +16,7 @@ import {MyUI} from "../lib/MyUI.js"
 import Stats from '../lib/three/examples/jsm/libs/stats.module.js'
 import {OrbitControls} from '../lib/three/examples/jsm/controls/OrbitControls.js'
 import {WanderControl} from "../lib/WanderControl"
-import { PlayerControl } from '../lib/PlayerControl'
+// import { PlayerControl } from '../lib/PlayerControl'
 import { smokemap } from './map_smoke.js'
 import { AvatarManager } from './AvatarManager.js'
 import { _SRGBAFormat } from "three"
@@ -45,7 +45,7 @@ export class Viewer
         this.activeCamera.layers.enableAll()
         this.defaultCamera.up.set(0,0,1)
 
-        this.sceneEx = new Scene()
+        this.sceneEx = this.scene//new Scene()
         window.scene=this.sceneEx
         this.sceneEx.add(this.defaultCamera)
 
@@ -63,27 +63,9 @@ export class Viewer
 
         var speed = 10
         this.vc = new Vector3(0,0,0)
-        if(window.projectName==='HaiNing'){
-            speed = 300
-            this.vc = this.update_matrix(new Vector3(-127.6,101.3,58.6))
-        }else if(window.projectName==='KaiLiNan'){
+        if(window.projectName==='KaiLiNan'){
             speed = 200
             this.vc = this.update_matrix(new Vector3(-467.5,31.3,74.5))
-        }else if(window.projectName==='LanQiao'){
-            speed = 200
-            this.vc = this.update_matrix(new Vector3(228.1,277.9,117.7))
-        }else if(window.projectName==='QinLaiLi'){
-            speed = 200
-            this.vc = this.update_matrix(new Vector3(10.8,46.8,-3.6))
-        }else if(window.projectName==='RenFuYiYuan'){
-            speed = 1000
-            this.vc = this.update_matrix(new Vector3(364.0,452.1,-1232.9))
-        }else if(window.projectName==='XinYu'){
-            speed = 100
-            this.vc = this.update_matrix(new Vector3(318.6,-12.4,-87.6))
-        }else if(window.projectName==='YunXi'){
-            speed = 200
-            this.vc = this.update_matrix(new Vector3(-5.7,35.5,-79.5))
         }
 
         // window.playerControl = this.playerControl = new PlayerControl(this.defaultCamera, speed/5)
@@ -104,10 +86,13 @@ export class Viewer
         window.addEventListener('resize', this.resize.bind(this), false)
 
         this.setupScene()
+        if(false){
             this.groundMesh = new THREE.Mesh(new THREE.PlaneGeometry(10000,10000), new THREE.MeshBasicMaterial({visible:false,side:THREE.DoubleSide, color:0xffffff}))
             this.groundMesh.position.set(0,0,550)
             this.sceneEx.add(this.groundMesh)
             this.ray = new THREE.Raycaster()
+        }
+            
         //     this.pressed = false 
         // }
         var _self = this
@@ -159,10 +144,13 @@ export class Viewer
 
 
         this.onMouseDown = function(event){
-            let point = new THREE.Vector2(( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1)
-            _self.ray.setFromCamera( point, _self.defaultCamera );
-            let ins = _self.ray.intersectObjects( [_self.groundMesh], false );
-            if(ins.length > 0 && _self.vis) _self.map.smoke_plane.fire_alarm(ins[0].point)
+            if(_self.ray){
+                let point = new THREE.Vector2(( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1)
+                _self.ray.setFromCamera( point, _self.defaultCamera );
+                let ins = _self.ray.intersectObjects( [_self.groundMesh], false );
+                if(ins.length > 0 && _self.vis) _self.map.smoke_plane.fire_alarm(ins[0].point)
+            }
+            
 
         }
 
@@ -174,6 +162,41 @@ export class Viewer
         document.addEventListener( 'mousemove', this.onMouseMove, true );
         document.addEventListener( 'mousedown', this.onMouseDown, true );
         document.addEventListener( 'mouseup', this.onMouseUp, true );
+
+        this.getCubeMapTexture('assets/environment/skybox.jpg').then(
+            ({ envMap }) => {
+                // alert(envMap)
+                window.scene=_self.scene
+                console.log(_self.scene)
+              _self.scene.background = envMap
+            //   _self.scene.backgroundIntensity=0.8
+            //   _self.scene.backgroundIntensity=0.4
+            //   self.unrealBloom.bloomPass.strength=0.55
+              _self.scene.environment = envMap
+            }
+        )
+    }
+    getCubeMapTexture(path) {
+        var scope = this
+        return new Promise((resolve, reject) => {//'.exr'
+            new THREE.TextureLoader()
+            //.setDataType(THREE.FloatType)
+            .load(
+                path,
+                texture => {
+                const pmremGenerator = new THREE.PMREMGenerator(scope.renderer)
+                pmremGenerator.compileEquirectangularShader()
+
+                const envMap =//texture
+                    pmremGenerator.fromEquirectangular(texture).texture
+                pmremGenerator.dispose()
+
+                resolve({ envMap })
+                },
+                undefined,
+                reject
+            )
+        })
     }
 
     animate(){

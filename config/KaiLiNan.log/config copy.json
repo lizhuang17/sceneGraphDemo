@@ -1,0 +1,17 @@
+[
+    {
+        "min":[-507,24,42],
+        "max":[-426,38,101],
+        "step":[81,14,59],
+        "path":"./assets/models/KaiLiNan.log/7.ls_d.json",
+        "preload":false
+    },
+    {
+        "min":[-507,24,42],
+        "max":[-426,38,101],
+        "step":[81,14,59],
+        "path":"./assets/models/KaiLiNan.log/7.ls_i.json",
+        "preload":true
+    }
+
+]
