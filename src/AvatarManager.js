@@ -96,7 +96,7 @@ export class AvatarManager {
                 }
             }
             c1.lod_distance[c1.lod_distance.length-2]*=2
-            c1.lod_distance[c1.lod_distance.length-1]*=4//*2
+            c1.lod_distance[c1.lod_distance.length-1]*=4*4
         }
         return config[0]
     }

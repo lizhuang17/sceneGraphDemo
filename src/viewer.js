@@ -279,10 +279,37 @@ export class Viewer
 
     setCamera(){
         window.orbitControl.target.set(478, 232, 520)
-        this.defaultCamera.position.copy(new THREE.Vector3(46, 428, 520))
-        this.defaultCamera.rotation.set(-1.4224373930666911,-0.6568369064643255,-3.050584019382628)
+        // this.defaultCamera.position.copy(new THREE.Vector3(46, 428, 520))
+        // this.defaultCamera.rotation.set(-1.4224373930666911,-0.6568369064643255,-3.050584019382628)
         this.activeCamera = this.defaultCamera
         window.camera=this.activeCamera
+
+        // this.defaultCamera.position.set(391.9,1094.1,1126.1)
+        this.defaultCamera.position.set(906.4026407251268,  2040.6948402673988,  545.409892018307)
+        this.defaultCamera.lookAt(163.7,107.0,102.8)
+
+
+        // const m1 = new Matrix4(); 
+        // m1.set( //当前坐标系
+        //     0.017926,0,0,0,
+        //     0, 0.017926,0,0,
+        //     0,0,0.017926,0,
+        //     22026.806641,2149.515381,224.10112,1
+        // )
+        // m1.transpose ()
+        
+        // const m2 = new Matrix4(); 
+        // m2.set( //目标坐标系
+        //     0.0004002784336784668, 0, 0, 0, 
+        //     0, 8.88796666661455e-20, -0.0004002784336784668, 0, 
+        //     0, 0.0004002784336784668, 8.88796666661455e-20, 0, 
+        //     24.35273726404087, 24.35274977274192, 24.35274977274192, 1
+        // )
+        // m2.transpose ()     
+        // m2.invert()
+        // const m=m1.multiply(m2)
+        // this.defaultCamera.applyMatrix4(m)
+
     }
 
     update_matrix(pos){
@@ -653,24 +680,7 @@ export class Viewer
 
     addWanderControl(speed){
         var route = []
-        if(window.projectName==='HaiNing'){
-            route = [
-                new Vector3(-225.5,273.3,245.5),
-                new Vector3(-589.9,123.2,246.0),
-                new Vector3(-840.6,107.0,260.4),
-                new Vector3(-848.9,105.5,165.4),
-                new Vector3(219.0,105.8,139.9),
-                new Vector3(82.4,114.4,38.4),
-                new Vector3(-51.8,114.2,52.4),
-                new Vector3(71.2,44.2,36.0),
-                new Vector3(-9.3,35.5,-17.0),
-                new Vector3(-952.8,46.7,-20.9),
-                new Vector3(-1158.1,22.7,-81.7),
-                new Vector3(-1566.8,53.7,-57.6),
-                new Vector3(391.9,1094.1,1126.1),
-                new Vector3(163.7,107.0,102.8)
-            ]
-        }else if(window.projectName==='KaiLiNan'){
+        if(window.projectName==='KaiLiNan'){
             route = [
                 new Vector3(-453.0,27.2,55.4),
                 new Vector3(-463.5,31.1,55.5),
@@ -688,96 +698,7 @@ export class Viewer
                 new Vector3(-440.7,40.0,103.4),
                 new Vector3(-459.7,26.6,73.9)
             ]
-        }else if(window.projectName==='LanQiao'){
-            route = [
-                new Vector3(-476.2,17.7,441.6),
-                new Vector3(-241.3,21.4,413.3),
-                new Vector3(146.6,23.5,408.6),
-                new Vector3(140.0,26.7,318.9),
-                new Vector3(-252.0,205.4,319.3),
-                new Vector3(-340.9,200.9,306.1),
-                new Vector3(-341.7,203.1,251.2),
-                new Vector3(-339.8,274.6,109.6),
-                new Vector3(-106.2,273.8,85.5),
-                new Vector3(53.3,274.1,176.4),
-                new Vector3(72.4,274.9,113.0),
-                new Vector3(-42.9,273.0,65.0),
-                new Vector3(-312.0,268.6,-124.1),
-                new Vector3(-311.1,267.1,-178.9),
-                new Vector3(-188.1,269.8,-199.4),
-                new Vector3(100.1,367.7,-205.0),
-                new Vector3(141.2,379.9,-77.2),
-                new Vector3(181.1,512.9,913.8),
-                new Vector3(171.8,96.6,242.5)
-            ]
-        }else if(window.projectName==='QinLaiLi'){
-            route = [
-                new Vector3(396.4,48.1,-58.5),
-                new Vector3(273.9,42.8,-36.7),
-                new Vector3(-100.7,44.9,-30.2),
-                new Vector3(-55.7,40.9,-3.9),
-                new Vector3(-3.5,24.5,-3.5),
-                new Vector3(195.0,24.2,20.4),
-                new Vector3(362.2,20.7,23.6),
-                new Vector3(472.1,39.3,55.1),
-                new Vector3(468.7,62.3,25.9),
-                new Vector3(352.7,68.6,-4.8),
-                new Vector3(-408.8,66.8,-3.5),
-                new Vector3(-182.4,251.1,-306.4),
-                new Vector3(-103.7,40.9,-7.8)
-            ]
-        }else if(window.projectName==='RenFuYiYuan'){
-            route = [
-                new Vector3(-1044.5,849.4,-4691.9),
-                new Vector3(29.6,318.2,-4710.6),
-                new Vector3(417.3,340.4,-4740.9),
-                new Vector3(484.2,291.6,-490.9),
-                new Vector3(3925.0,361.2,-314.9),
-                new Vector3(3821.1,263.8,-205.3),
-                new Vector3(4088.0,69.8,-209.3),
-                new Vector3(3684.5,50.7,-316.4),
-                new Vector3(60.2,31.2,-371.4),
-                new Vector3(-2491.8,89.6,-433.4),
-                new Vector3(-5433.6,79.8,-35.6),
-                new Vector3(-8064.4,68.3,156.2),
-                new Vector3(320.0,5169.8,-7571.8),
-                new Vector3(320.0,435.9,-2944.2)
-            ]
-        }else if(window.projectName==='XinYu'){
-            route = [
-                new Vector3(193.6,-12.8,-110.9),
-                new Vector3(194.2,-13.0,-98.9),
-                new Vector3(282.1,-11.8,-98.7),
-                new Vector3(304.0,-12.1,-87.2),
-                new Vector3(332.3,-21.6,-86.1),
-                new Vector3(334.5,-22.0,-92.7),
-                new Vector3(324.7,-22.4,-94.3),
-                new Vector3(178.8,-22.2,-96.2),
-                new Vector3(151.3,-21.8,-100.3),
-                new Vector3(164.2,-21.6,-103.3),
-                new Vector3(381.9,-18.7,-102.1),
-                new Vector3(574.8,-16.4,-99.1),
-                new Vector3(224.4,138.6,-221.4),
-                new Vector3(257.9,-13.9,-88.5)
-            ]
-        }else if(window.projectName==='YunXi'){
-            route = [
-                new Vector3(-363.0,99.2,70.0),
-                new Vector3(-242.5,51.6,69.2),
-                new Vector3(-197.9,47.2,66.7),
-                new Vector3(-192.2,45.3,-32.7),
-                new Vector3(-2.6,49.1,-42.0),
-                new Vector3(56.6,23.1,-74.2),
-                new Vector3(35.3,20.1,-86.8),
-                new Vector3(-209.5,22.0,-86.0),
-                new Vector3(-157.6,46.0,-77.0),
-                new Vector3(-237.3,47.1,-97.5),
-                new Vector3(-322.2,47.6,-98.4),
-                new Vector3(-405.3,48.0,-116.7),
-                new Vector3(103.2,389.4,287.9),
-                new Vector3(38.8,43.0,-30.6)
-            ]
-        }else{ }
+        }
 
         for(var i = 0; i < route.length; i++)
             route[i] = this.update_matrix(route[i])
