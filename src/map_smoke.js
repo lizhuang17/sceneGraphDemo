@@ -27,7 +27,7 @@ export class smokemap{
         this.texture_data = new Float32Array(2643*1537*4)
         this.simplex = new SimplexNoise()
         let self = this
-         
+         console.log()
         loadJson("wall_KaiLiNan.json",data=>{
             const temp={}
             for(let p of data)temp[p]=true
