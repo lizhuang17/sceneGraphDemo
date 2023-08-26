@@ -109,9 +109,27 @@ export class Viewer
         this.sirenSound = new THREE.Audio( listener1 )
         let listener2 = new THREE.AudioListener();
         this.noiseSound = new THREE.Audio( listener2 )
+        const slider_fire = document.getElementById('slider_fire')
+		const slider_people = document.getElementById('slider_people')
+		const crowd = document.getElementById('crowd')
+		const fire = document.getElementById('fire')
+		slider_people.addEventListener('input', event=>{
+			let value = event.target.value
+			crowd.textContent = value
+            _self.people.count = value
+		})
+		slider_fire.addEventListener('input', event=>{
+			let value = event.target.value
+			fire.textContent = value
+            _self.map.smoke_plane.speed = value
+		})
+        const c_button = document.getElementById("crowd_b");
+        c_button.addEventListener("click", function() {
+            document.getElementById("crowd_line").style.display="none"
+            _self.people.seted = true
+        });
         this.start_button = document.getElementById("start_b");
         this.start_button.addEventListener("click", function() {
-            console.log("按钮被点击了！");
             if(!_self.map.finish_load)
                 _self.map.init(_self.renderer)
             var audioLoader = new THREE.AudioLoader();
@@ -220,7 +238,7 @@ export class Viewer
         requestAnimationFrame(this.animate)
 
         this.stats.update()
-        if(this.map.maps.finish_load &&  this.people.seted){
+        if(this.map.maps.finish_load && this.people.seted){
             this.people.setPos()
             this.start_button.style.display="block"
         }
@@ -277,6 +295,7 @@ export class Viewer
                 this.groundMesh.position.set(0,0,550)
                 document.getElementById("setfire").style.display="block"
                 document.getElementById("start_b").style.display="none"
+                document.getElementById("fire_line").style.display="block"
                 this.globalPlane.constant =549
                 this.cp_o = [this.defaultCamera.position.x,this.defaultCamera.position.y,this.defaultCamera.position.z]
                 this.cr_o = [this.defaultCamera.rotation.x,this.defaultCamera.rotation.y,this.defaultCamera.rotation.z]
@@ -286,6 +305,7 @@ export class Viewer
             else{
                 document.getElementById("start_b").style.display="block"
                 document.getElementById("setfire").style.display="none"
+                document.getElementById("fire_line").style.display="none"
                 this.defaultCamera.position.copy(new THREE.Vector3(this.cp_o[0], this.cp_o[1], this.cp_o[2]))
                 this.defaultCamera.rotation.set(this.cr_o[0], this.cr_o[1], this.cr_o[2])
                 this.globalPlane.constant = 10000
@@ -309,6 +329,7 @@ export class Viewer
                 document.getElementById("abstract").style.display="block"
                 document.getElementById("start_b").style.display="none"
                 document.getElementById("setfire").style.display="none"
+                document.getElementById("fire_line").style.display="none"
                 this.globalPlane.constant =549
                 this.cp_o = [this.defaultCamera.position.x,this.defaultCamera.position.y,this.defaultCamera.position.z]
                 this.cr_o = [this.defaultCamera.rotation.x,this.defaultCamera.rotation.y,this.defaultCamera.rotation.z]

@@ -4,7 +4,7 @@ import config_woman   from '../config/sceneConifg_woman0.json'
 import config_man from '../config/sceneConifg_man01.json'
 import * as THREE from "three"
 export class AvatarManager {
-    constructor(scene, camera, map, count=200) {
+    constructor(scene, camera, map, count=1000) {
         this.scene = scene
         this.camera = camera
         this.count = count// 人物数量
@@ -20,7 +20,7 @@ export class AvatarManager {
         this.ids = []
         this.dp = []
         this.times = []
-        this.seted = true
+        this.seted = false
         this.camerapos = []
     }
     setPos(){// 随机设置人物位置 

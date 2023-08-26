@@ -7,9 +7,11 @@
     <meta name="description" content="">
     <link rel="shortcut icon" href="assets/favicon.ico">
     <link rel="stylesheet" href="css/style.css">
+	<p id="crowd_line" style="font-size: 20px;"> Crowd number: <span id="crowd">1000</span><input type="range" id="slider_people" name="slider_people" min="100" max="3000" value="1000" style="width:50%; left:5%">	<button id="crowd_b" style="background-color: aqua; color: black; font-size: 20px; height: auto; right: 5%; width:20%;">Confirm</button></p>
 	<p id="setfire" style="display: none;" align="center">Click to set up fires. Even without setting up fires, you can still simulate smoke with the default configuration.</p>
 	<p id="abstract" style="display: none;" align="center">Click the smoke-layer to simulate smoke alarm and calibrate the smoke.</p>
 	<button id="start_b" style="background-color: aqua; color: black; left: 50%; font-size: 30px; display: none;">Start Fire Evacuation</button>
+	<p id="fire_line" style="font-size: 20px; display: none;"> Fire speed: <span id="fire">3</span><input type="range" id="slider_fire" name="slider_fire" min="1" max="6" value="3"style="width:50%; left:5%"></p>
 	<script src="src/app.js"></script>
 	</head>
 <body>
