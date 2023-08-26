@@ -95,7 +95,7 @@ export class AvatarManager {
                     c1.lod_visible[j][tag]=lodConut
                 }
             }
-            // c1.lod_distance[c1.lod_distance.length-2]*=2
+            c1.lod_distance[c1.lod_distance.length-2]*=2
             c1.lod_distance[c1.lod_distance.length-1]*=4//*2
         }
         return config[0]
@@ -346,6 +346,7 @@ export class AvatarManager {
             self.crowd[i].init(scenes)
             
             self.scene.add(self.crowd[i])
+            self.scene.add(self.crowd[i].CrowdPoints)
         }
     }
     update(){

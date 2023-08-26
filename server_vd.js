@@ -21,7 +21,8 @@ const configList=[
       101,
       59
     ],
-    path:"dist/assets/models/KaiLiNan.log/7.ls_d.json"
+    // path:"dist/assets/models/KaiLiNan.log/7.ls_d.json"
+    path:"dist/assets/models/KaiLiNan.log/7.ls_d0.json"
   }
 ]
 console.log('version:02(node --max_old_space_size=8192 server_vd)')
@@ -50,6 +51,8 @@ class VD{
     require('jsonfile').readFile(
         path, 
         (err, jsonData)=>{
+          self.jsonData=jsonData
+          console.log(jsonData["-466,31,63"])
           if (err) throw err
           for(let vid in jsonData){
             const d=jsonData[vid]
@@ -109,6 +112,12 @@ class VD{
     return vdList
   } 
   static getEvd(info,vdList){
+    if(typeof info=="undefined"||typeof info.point=="undefined"){
+      console.log("请检查数据格式")
+      return null
+    }else{
+      return vdList[0].jsonData[info.point]
+    }
     if(typeof info=="undefined"||typeof info.sceneId=="undefined"||typeof info.areaId=="undefined"){
       console.log("系统版本未更新")
       return null
@@ -123,6 +132,10 @@ class VD{
   }
 }
 const vdList=VD.getVdList(configList,usePVD)
+// setTimeout(()=>{
+//   console.log(vdList[0].jsonData["-466,31,63"])
+// },1000)
+
 ////////////////////////////////////////////////////////////
 const port=8091
 // const fs = require('fs');
