@@ -223,9 +223,9 @@ export class AvatarManager {
                     18*(1-0.2+0.2*Math.random()),
                     18])
                 self.crowd[i].setObesity(i00, 0.8+0.4*Math.random())
-                const j=10
-                self.crowd[i].setColor(i00,[j*Math.random()*2,j*Math.random(),j*Math.random()],"CloW_A_kuzi_geo")
-                self.crowd[i].setColor(i00,[j*Math.random()*2,j*Math.random(),j*Math.random()],"CloW_A_waitao_geo1")
+                // const j=10
+                // self.crowd[i].setColor(i00,[j*Math.random()*2,j*Math.random(),j*Math.random()],"CloW_A_kuzi_geo")
+                // self.crowd[i].setColor(i00,[j*Math.random()*2,j*Math.random(),j*Math.random()],"CloW_A_waitao_geo1")
             }
             ////////////
             const crowd=self.crowd[i]
@@ -346,7 +346,7 @@ export class AvatarManager {
             self.crowd[i].init(scenes)
             
             self.scene.add(self.crowd[i])
-            self.scene.add(self.crowd[i].CrowdPoints)
+            // self.scene.add(self.crowd[i].CrowdPoints)
         }
     }
     update(){
